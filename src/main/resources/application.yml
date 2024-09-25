@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${HOME_URL}
+    username: ${HOME_USERNAME}
+    password: ${HOME_PASSWORD}
+
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        highlight_sql: true
+        generate_statistics: true
+        ddl-auto: update
+    show-sql: true
+
+
