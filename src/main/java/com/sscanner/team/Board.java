@@ -1,12 +1,10 @@
 package com.sscanner.team;
 
 import com.sscanner.team.global.common.BaseEntity;
+import com.sscanner.team.trashcan.entity.Trashcan;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-
-import java.time.Instant;
 
 @Getter
 @Entity

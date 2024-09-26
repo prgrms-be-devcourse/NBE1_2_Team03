@@ -1,15 +1,13 @@
-package com.sscanner.team;
+package com.sscanner.team.trashcan.entity;
 
 import com.sscanner.team.global.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 
 @Getter
 @Entity
