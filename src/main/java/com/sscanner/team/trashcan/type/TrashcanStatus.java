@@ -2,6 +2,6 @@ package com.sscanner.team.trashcan.type;
 
 public enum TrashcanStatus {
     EMPTY,
-    intermediate,
+    INTERMEDIATE,
     FULL
 }
