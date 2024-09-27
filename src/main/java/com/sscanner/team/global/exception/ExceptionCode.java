@@ -22,7 +22,8 @@ public enum ExceptionCode {
     DUPLICATED_PRODUCT_NAME(409, "이미 존재하는 상품명입니다.");
     */
 
-    NOT_FOUND_TRASHCAN_ID(400, "해당하는 쓰레기통이 존재하지 않습니다."),
+    //BAD REQUEST
+    NOT_EXIST_TRASHCAN_ID(400, "해당하는 쓰레기통이 존재하지 않습니다."),
 
     ;
 
