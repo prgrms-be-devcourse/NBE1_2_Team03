@@ -1,4 +1,4 @@
-package com.sscanner.team.user;
+package com.sscanner.team.user.repository;
 
 import com.sscanner.team.User;
 import org.springframework.data.jpa.repository.JpaRepository;

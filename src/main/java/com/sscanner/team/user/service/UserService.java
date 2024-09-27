@@ -1,7 +1,8 @@
-package com.sscanner.team.user;
+package com.sscanner.team.user.service;
 
-import com.sscanner.team.global.exception.BadRequestException;
-import com.sscanner.team.global.exception.ExceptionCode;
+import com.sscanner.team.user.repository.UserRepository;
+import com.sscanner.team.user.requestDto.UserJoinRequestDto;
+import com.sscanner.team.user.responseDto.UserJoinResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,11 +36,11 @@ public class UserService {
     }
 
     // 회원가입
-    public UserJoinResponseDTO join(UserJoinRequestDTO req){
+    public UserJoinResponseDto join(UserJoinRequestDto req){
         var userEntity = req.toEntity(passwordEncoder.encode(req.password()));
         userRepository.save(userEntity);
 
-        return UserJoinResponseDTO.fromEntity(userEntity);
+        return UserJoinResponseDto.fromEntity(userEntity);
     }
 
 

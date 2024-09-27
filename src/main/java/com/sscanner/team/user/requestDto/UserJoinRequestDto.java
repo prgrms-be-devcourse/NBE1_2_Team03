@@ -1,9 +1,9 @@
-package com.sscanner.team.user;
+package com.sscanner.team.user.requestDto;
 
 import com.sscanner.team.User;
 import jakarta.validation.constraints.NotBlank;
 
-public record UserJoinRequestDTO(
+public record UserJoinRequestDto(
 
         @NotBlank(message = "에미일이 비어있습니다.")
         String email,

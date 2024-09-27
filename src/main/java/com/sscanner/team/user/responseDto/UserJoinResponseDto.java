@@ -1,16 +1,16 @@
-package com.sscanner.team.user;
+package com.sscanner.team.user.responseDto;
 
 import com.sscanner.team.User;
 
-public record UserJoinResponseDTO (
+public record UserJoinResponseDto(
         String userId,
         String email,
         String nickname,
         String phone
 ){
 
-    public static UserJoinResponseDTO fromEntity(User user) {
-        return new UserJoinResponseDTO(
+    public static UserJoinResponseDto fromEntity(User user) {
+        return new UserJoinResponseDto(
                 user.getUserId(),
                 user.getEmail(),
                 user.getNickname(),
