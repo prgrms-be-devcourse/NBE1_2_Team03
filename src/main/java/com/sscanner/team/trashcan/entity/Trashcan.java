@@ -31,7 +31,7 @@ public class Trashcan extends BaseEntity {
     @Column(name = "road_name_address", nullable = false, length = 100)
     private String roadNameAddress;
 
-    @Column(name = "detailed_address", nullable = false, length = 100)
+    @Column(name = "detailed_address", length = 100)
     private String detailedAddress;
 
     @Enumerated(EnumType.STRING)
