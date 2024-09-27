@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum ExceptionCode {
 
+    /* 예시 코드
     //Bad Request
     NOT_FOUND_PRODUCT_ID(400, "해당하는 상품이 존재하지 않습니다."),
     NOT_FOUND_ORDER_ID(400, "취소되었거나 존재하지 않는 주문입니다."),
@@ -19,7 +20,12 @@ public enum ExceptionCode {
 
     //conflict
     DUPLICATED_PRODUCT_NAME(409, "이미 존재하는 상품명입니다.");
+    */
 
+    //BAD REQUEST
+    NOT_EXIST_TRASHCAN_ID(400, "해당하는 쓰레기통이 존재하지 않습니다."),
+
+    ;
 
     private final int code;
     private final String message;
