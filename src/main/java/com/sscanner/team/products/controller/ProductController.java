@@ -2,7 +2,7 @@ package com.sscanner.team.products.controller;
 
 import com.sscanner.team.global.common.response.ApiResponse;
 import com.sscanner.team.products.responsedto.ProductResponseDto;
-import com.sscanner.team.products.service.ProductService;
+import com.sscanner.team.products.service.ProductServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +20,7 @@ import java.util.Map;
 @RequestMapping("/api/products")
 public class ProductController {
 
-    private final ProductService productService;
+    private final ProductServiceImpl productService;
 
     @GetMapping
     public ApiResponse<Map<String, Object>> getAllProducts(
