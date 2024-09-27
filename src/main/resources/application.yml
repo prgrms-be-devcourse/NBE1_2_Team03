@@ -7,13 +7,22 @@ spring:
 
 
   jpa:
+    hibernate:
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
         highlight_sql: true
         generate_statistics: true
-        ddl-auto: update
     show-sql: true
 
+aws:
+  access-key: ${AWS_ACCESS_KEY}
+  secret-key: ${AWS_SECRET_KEY}
+  region.static: ${AWS_REGION}
+
+  s3:
+    bucket: ${AWS_S3_BUCKET}
+    base-url: ${AWS_S3_BASE_URL}
 
