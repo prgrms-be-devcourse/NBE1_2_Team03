@@ -25,6 +25,8 @@ public enum ExceptionCode {
     //BAD REQUEST
     NOT_EXIST_TRASHCAN_ID(400, "해당하는 쓰레기통이 존재하지 않습니다."),
 
+    //NOT FOUND
+    NO_NEARBY_TRASHCAN_FOUND(404, "근처에 쓰레기통이 없습니다."),
     ;
 
     private final int code;

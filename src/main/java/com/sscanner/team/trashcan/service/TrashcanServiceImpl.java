@@ -9,7 +9,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.sscanner.team.global.exception.ExceptionCode.NOT_EXIST_TRASHCAN_ID;
+import static com.sscanner.team.global.exception.ExceptionCode.NO_NEARBY_TRASHCAN_FOUND;
 
 @RequiredArgsConstructor
 @Service
@@ -29,26 +34,47 @@ public class TrashcanServiceImpl implements TrashService{
     }
 
     @Override
-    public TrashcanResponseDto getTrashcanInfoById(Long trashcanId) {
+    public TrashcanResponseDto getTrashcanInfo(Long trashcanId) {
 
-        Trashcan trashcan = trashcanRepository.findById(trashcanId)
-                .orElseThrow(() -> new BadRequestException(NOT_EXIST_TRASHCAN_ID));
+        Trashcan trashcan = getTrashcanById(trashcanId);
 
         return TrashcanResponseDto.from(trashcan);
     }
 
+    private Trashcan getTrashcanById(Long trashcanId) {
+        return trashcanRepository.findById(trashcanId)
+                .orElseThrow(() -> new BadRequestException(NOT_EXIST_TRASHCAN_ID));
+    }
+
+    //좌표로 근처 쓰레기통을 조회하는 메서드
     @Override
-    public TrashcanResponseDto getNearByTrashcans() {
+    public List<TrashcanResponseDto> getTrashcansByCoordinate(BigDecimal latitude, BigDecimal longitude) {
+
+        List<Trashcan> trashcans = getTrashcansByLatAndLongitude(latitude, longitude);
+
+        return convertToTrashcanResponses(trashcans);
+    }
+
+    private List<Trashcan> getTrashcansByLatAndLongitude(BigDecimal latitude, BigDecimal longitude) {
+        return trashcanRepository.findTrashcansWithinRadius(latitude, longitude, 200)
+                .orElseThrow(() -> new BadRequestException(NO_NEARBY_TRASHCAN_FOUND));
+    }
+
+    private static List<TrashcanResponseDto> convertToTrashcanResponses(List<Trashcan> trashcans) {
+        List<TrashcanResponseDto> trashcanResponseDtos = new ArrayList<>();
+        for (Trashcan trashcan : trashcans) {
+            trashcanResponseDtos.add(TrashcanResponseDto.from(trashcan));
+        }
+        return trashcanResponseDtos;
+    }
+
+    @Override
+    public TrashcanResponseDto getTrashcanByRoadAddress() {
         return null;
     }
 
     @Override
     public TrashcanResponseDto getNearByTrashcans2() {
-        return null;
-    }
-
-    @Override
-    public TrashcanResponseDto getTrashcanByRoadAddress() {
         return null;
     }
 
