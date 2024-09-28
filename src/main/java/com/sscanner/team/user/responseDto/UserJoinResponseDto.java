@@ -9,7 +9,7 @@ public record UserJoinResponseDto(
         String phone
 ){
 
-    public static UserJoinResponseDto fromEntity(User user) {
+    public static UserJoinResponseDto from(User user) {
         return new UserJoinResponseDto(
                 user.getUserId(),
                 user.getEmail(),
