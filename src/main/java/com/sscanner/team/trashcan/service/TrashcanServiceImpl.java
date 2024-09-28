@@ -20,7 +20,8 @@ import static com.sscanner.team.global.exception.ExceptionCode.NO_NEARBY_TRASHCA
 @Service
 public class TrashcanServiceImpl implements TrashService{
 
-    private static final int radiusForSearch = 200;
+    //쓰레기통 위도, 경도 검색 범위 설정 미터단위
+    private static final int RADIUS_FOR_SEARCH = 200;
 
     private final TrashcanRepository trashcanRepository;
 
@@ -58,7 +59,7 @@ public class TrashcanServiceImpl implements TrashService{
     }
 
     private List<Trashcan> getTrashcansByLatAndLongitude(BigDecimal latitude, BigDecimal longitude) {
-        return trashcanRepository.findTrashcansWithinRadius(latitude, longitude, radius)
+        return trashcanRepository.findTrashcansWithinRadius(latitude, longitude, RADIUS_FOR_SEARCH)
                 .orElseThrow(() -> new BadRequestException(NO_NEARBY_TRASHCAN_FOUND));
     }
 
