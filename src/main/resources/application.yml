@@ -8,13 +8,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
         highlight_sql: true
-        generate_statistics: true
     show-sql: true
 
 aws:

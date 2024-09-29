@@ -9,19 +9,22 @@ import com.sscanner.team.board.entity.Board;
 import com.sscanner.team.board.entity.BoardImg;
 import com.sscanner.team.board.repository.BoardImgRepository;
 import com.sscanner.team.global.exception.BadRequestException;
-import com.sscanner.team.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static com.sscanner.team.global.exception.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BoardImgServiceImpl implements BoardImgService{
 
     private final BoardImgRepository boardImgRepository;
@@ -34,19 +37,30 @@ public class BoardImgServiceImpl implements BoardImgService{
     private String baseUrl;
 
     @Override
-    public void saveBoardImg(Board board, MultipartFile file) {
-        String boardImgUrl = makeImgUrl(file);
+    public List<BoardImg> saveBoardImg(Board board, List<MultipartFile> files) {
+        List<BoardImg> boardImgs = new ArrayList<>();
+        for(MultipartFile file : files) {
+            String boardImgUrl = makeImgUrl(file);
 
-        BoardImg boardImg = BoardImg.makeBoardImg(board, boardImgUrl);
+            BoardImg boardImg = BoardImg.makeBoardImg(board, boardImgUrl);
 
-        boardImgRepository.save(boardImg);
+            boardImgs.add(boardImgRepository.save(boardImg));
+        }
+
+        return boardImgs;
     }
 
+    /**
+     * 이미지 url 생성
+     * @param file
+     * @return String - 이미지 url
+     */
     @Override
     public String makeImgUrl(MultipartFile file) {
         isExistFile(file);
 
         String originalFileName = file.getOriginalFilename();
+
 
         String ext = separateExt(originalFileName);
 
@@ -62,7 +76,8 @@ public class BoardImgServiceImpl implements BoardImgService{
      * 파일 존재 여부 확인
      * @param file - 이미지 파일
      */
-    private void isExistFile(MultipartFile file) {
+    @Override
+    public void isExistFile(MultipartFile file) {
         if(file.isEmpty() && file.getOriginalFilename() != null) {
             throw new BadRequestException(NOT_EXIST_FILE);
         }
@@ -73,7 +88,8 @@ public class BoardImgServiceImpl implements BoardImgService{
      * @param originalFileName - 원본 파일 이름
      * @return 확장자
      */
-    private String separateExt(String originalFileName) {
+    @Override
+    public String separateExt(String originalFileName) {
         String ext = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
 
         if (!(ext.equals("jpg")
@@ -91,7 +107,8 @@ public class BoardImgServiceImpl implements BoardImgService{
      * @param file - 이미지 파일
      * @param fileName - 새로 생성한 파일 이름
      */
-    private void uploadS3(MultipartFile file, String fileName) {
+    @Override
+    public void uploadS3(MultipartFile file, String fileName) {
         try {
             ObjectMetadata objMeta = new ObjectMetadata();
             byte[] bytes = IOUtils.toByteArray(file.getInputStream()); // 파일의 데이터를 바이트로 읽습니다.
