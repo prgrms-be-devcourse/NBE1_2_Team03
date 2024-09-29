@@ -9,6 +9,7 @@ import com.sscanner.team.board.entity.Board;
 import com.sscanner.team.board.entity.BoardImg;
 import com.sscanner.team.board.repository.BoardImgRepository;
 import com.sscanner.team.global.exception.BadRequestException;
+import com.sscanner.team.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
