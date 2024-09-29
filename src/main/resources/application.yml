@@ -5,15 +5,22 @@ spring:
     username: ${HOME_USERNAME}
     password: ${HOME_PASSWORD}
 
-
   jpa:
+    hibernate:
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
         highlight_sql: true
-        generate_statistics: true
-        ddl-auto: update
     show-sql: true
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
