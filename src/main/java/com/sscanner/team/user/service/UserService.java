@@ -1,5 +1,6 @@
 package com.sscanner.team.user.service;
 
+import com.sscanner.team.User;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.DuplicateException;
 import com.sscanner.team.global.exception.ExceptionCode;
@@ -57,7 +58,7 @@ public class UserService {
         checkPhone(req.phone());
         confirmPassword(req.password(), req.passwordCheck());
 
-        var userEntity = req.toEntity(passwordEncoder.encode(req.password()));
+        User userEntity = req.toEntity(passwordEncoder.encode(req.password()));
         userRepository.save(userEntity);
 
         return UserJoinResponseDto.from(userEntity);
