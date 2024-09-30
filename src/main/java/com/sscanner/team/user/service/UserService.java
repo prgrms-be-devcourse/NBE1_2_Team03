@@ -19,27 +19,24 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     // 이메일 중복 체크
-    public void checkEmail(String email) {
-        userRepository.findByEmail(email)
-                .ifPresent(user -> {
-                    throw new DuplicateException(ExceptionCode.DUPLICATED_EMAIL);
-                });
+    private void checkDuplicatedEmail(final String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new DuplicateException(ExceptionCode.DUPLICATED_EMAIL);
+        }
     }
 
     //닉네임 중복 체크
-    public void checkNickname(String nickname) {
-        userRepository.findByNickname(nickname)
-                .ifPresent(user -> {
-                    throw new DuplicateException(ExceptionCode.DUPLICATED_NICKNAME);
-                });
+    private void checkDuplicatedNickname(final String nickname) {
+        if (userRepository.existsByNickname(nickname)) {
+            throw new DuplicateException(ExceptionCode.DUPLICATED_NICKNAME);
+        }
     }
 
     //핸드폰 중복 체크
-    public void checkPhone(String phone) {
-        userRepository.findByPhone(phone)
-                .ifPresent(user -> {
-                    throw new DuplicateException(ExceptionCode.DUPLICATED_PHONE);
-                });
+    private void checkDuplicatedPhone(final String phone) {
+        if (userRepository.existsByPhone(phone)) {
+            throw new DuplicateException(ExceptionCode.DUPLICATED_PHONE);
+        }
     }
 
     // 비밀번호 확인용 메서드
@@ -52,10 +49,10 @@ public class UserService {
     // 회원가입
     public UserJoinResponseDto join(UserJoinRequestDto req){
 
-        checkEmail(req.email());
-        checkNickname(req.nickname());
+        checkDuplicatedEmail(req.email());
+        checkDuplicatedNickname(req.nickname());
+        checkDuplicatedPhone(req.phone());
 
-        checkPhone(req.phone());
         confirmPassword(req.password(), req.passwordCheck());
 
         User userEntity = req.toEntity(passwordEncoder.encode(req.password()));
