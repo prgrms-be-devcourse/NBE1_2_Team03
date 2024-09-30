@@ -13,22 +13,34 @@ public enum ExceptionCode {
     NOT_FOUND_PRODUCT_ID(400, "해당하는 상품이 존재하지 않습니다."),
     NOT_FOUND_ORDER_ID(400, "취소되었거나 존재하지 않는 주문입니다."),
     NOT_FOUND_ITEM_ID(400, "해당 주문에 상품이 존재하지 않습니다."),
+    NOT_EXIST_FILE(400, "파일이 비어있습니다."),
+    FILE_UPLOAD_FAIL(400,  "파일 업로드를 실패하였습니다."),
+
 
     //Unauthorized
     INVALID_PASSWORD(401, "이메일이나 비밀번호가 일치하지 않습니다."),
     INVALID_EMAIL(401, "이메일이나 비밀번호가 일치하지 않습니다."),
 
     //conflict
+    DUPLICATED_PRODUCT_NAME(409, "이미 존재하는 상품명입니다."),
+
+    //Unsupported Media Type
+    BAD_FILE_EXTENSION(415, "적절하지 않은 파일 확장자입니다.");
     DUPLICATED_PRODUCT_NAME(409, "이미 존재하는 상품명입니다.");
     */
 
+    //Unsupported Media Type
+    BAD_FILE_EXTENSION(415, "적절하지 않은 파일 확장자입니다."),
+
     //BAD REQUEST
     NOT_EXIST_TRASHCAN_ID(400, "해당하는 쓰레기통이 존재하지 않습니다."),
+    NOT_EXIST_FILE(400, "파일이 비어있습니다."),
+    FILE_UPLOAD_FAIL(400,  "파일 업로드를 실패하였습니다.")
     DUPLICATED_EMAIL(409, "이미 가입된 이메일입니다. "),
     DUPLICATED_NICKNAME(409, "이미 가입된 닉네임입니다. "),
     DUPLICATED_PHONE(409, "이미 가입된 핸드폰 번호입니다. "),
     PASSWORD_NOT_MATCH(400, "비밀번호와 비밀번호 확인이 일치하지 않습니다."),
-    USER_NOT_FOUND(400,"해당 유저가 존재하지 않습니다.");
+    USER_NOT_FOUND(400,"해당 유저가 존재하지 않습니다.")
     ;
 
     private final int code;
