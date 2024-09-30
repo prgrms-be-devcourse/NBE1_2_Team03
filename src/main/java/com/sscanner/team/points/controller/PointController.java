@@ -2,8 +2,8 @@ package com.sscanner.team.points.controller;
 
 import com.sscanner.team.global.common.response.ApiResponse;
 import com.sscanner.team.points.responsedto.PointResponseDto;
-import com.sscanner.team.points.service.PaymentService;
-import com.sscanner.team.points.service.PointService;
+import com.sscanner.team.points.service.PaymentServiceImpl;
+import com.sscanner.team.points.service.PointServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/points")
 public class PointController {
 
-    private final PointService pointService;
-    private final PaymentService paymentService;
+    private final PointServiceImpl pointService;
+    private final PaymentServiceImpl paymentService;
 
     /**
      * 사용자의 현재 포인트를 조회하는 API
