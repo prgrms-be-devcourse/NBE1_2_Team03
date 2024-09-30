@@ -4,7 +4,6 @@ import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.trashcan.entity.Trashcan;
 import com.sscanner.team.trashcan.repository.TrashcanRepository;
 import com.sscanner.team.trashcan.requestDto.RegisterTrashcanRequestDto;
-import com.sscanner.team.trashcan.requestDto.UpdateTrashcanRequestDto;
 import com.sscanner.team.trashcan.responseDto.TrashcanResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,18 +28,13 @@ public class TrashcanServiceImpl implements TrashService{
         return TrashcanResponseDto.from(trashcan);
     }
 
-    //단건 조회 메서드
     @Override
-    public TrashcanResponseDto getTrashcanInfo(Long trashcanId) {
+    public TrashcanResponseDto getTrashcanInfoById(Long trashcanId) {
 
-        Trashcan trashcan = getTrashcanById(trashcanId);
+        Trashcan trashcan = trashcanRepository.findById(trashcanId)
+                .orElseThrow(() -> new BadRequestException(NOT_EXIST_TRASHCAN_ID));
 
         return TrashcanResponseDto.from(trashcan);
-    }
-
-    private Trashcan getTrashcanById(Long trashcanId) {
-        return trashcanRepository.findById(trashcanId)
-                .orElseThrow(() -> new BadRequestException(NOT_EXIST_TRASHCAN_ID));
     }
 
     @Override
@@ -59,19 +53,14 @@ public class TrashcanServiceImpl implements TrashService{
     }
 
     @Override
-    @Transactional
-    public TrashcanResponseDto updateTrashcanInfo(Long trashcanId, UpdateTrashcanRequestDto requestDto) {
-        Trashcan trashcan = getTrashcanById(trashcanId);
-
-        trashcan.updateInfo(requestDto);
-
-        return TrashcanResponseDto.from(trashcan);
+    public TrashcanResponseDto updateTrashcan() {
+        return null;
     }
 
     @Override
-    @Transactional
-    public void deleteTrashcanInfo(Long trashcanId) {
-        Trashcan trashcan = getTrashcanById(trashcanId);
-        trashcanRepository.delete(trashcan);
+    public TrashcanResponseDto deleteTrashcan() {
+        return null;
     }
+
+
 }
