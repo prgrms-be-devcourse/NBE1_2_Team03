@@ -3,6 +3,8 @@ package com.sscanner.team.points.service;
 import com.sscanner.team.PaymentRecord;
 import com.sscanner.team.Product;
 import com.sscanner.team.UserPoint;
+import com.sscanner.team.global.exception.BadRequestException;
+import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.points.repository.PaymentRepository;
 import com.sscanner.team.points.repository.PointRepository;
 import com.sscanner.team.points.responsedto.PointResponseDto;
@@ -36,16 +38,16 @@ public class PaymentServiceImpl implements PaymentService {
         String key = POINT_PREFIX + userId;
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("해당 상품은 존재하지 않습니다."));
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_ITEM_ID));
         UserPoint userPoint = pointRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
 
         Integer productPrice = product.getPrice();
 
         // Redis에서 총 포인트 가져오기
         Integer currentPoint = redisTemplate.opsForValue().get(key);
         if (currentPoint == null || currentPoint < productPrice) {
-            throw new IllegalArgumentException("사용 가능한 포인트가 부족합니다.");
+            throw new BadRequestException(ExceptionCode.NOT_ENOUGH_POINTS);
         }
 
         // Redis에서 포인트 차감

@@ -1,6 +1,8 @@
 package com.sscanner.team.points.service;
 
 import com.sscanner.team.UserPoint;
+import com.sscanner.team.global.exception.BadRequestException;
+import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.points.repository.PointRepository;
 import com.sscanner.team.points.responsedto.PointResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +34,7 @@ public class PointServiceImpl implements PointService {
 
         if (point == null) {
             UserPoint userPoint = pointRepository.findByUserId(userId)
-                    .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
+                    .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
             point = userPoint.getPoint();
             redisTemplate.opsForValue().set(key, point, 1, TimeUnit.DAYS);
         }
@@ -60,7 +62,7 @@ public class PointServiceImpl implements PointService {
         Integer dailyPoint = getCachedPoint(dailyKey);
 
         if (dailyPoint + point > DAILY_LIMIT) {
-            throw new IllegalArgumentException("일일 획득 포인트 초과");
+            throw new BadRequestException(ExceptionCode.DAILY_POINTS_EXCEEDED);
         }
 
         redisTemplate.opsForValue().increment(key, point);
