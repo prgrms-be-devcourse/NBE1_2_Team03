@@ -22,7 +22,7 @@ public class PointController {
      * @return 포인트 조회 성공 메시지
      */
     @GetMapping("/{userId}")
-    public ApiResponse<PointResponseDto> getPoints(@PathVariable String userId) {
+    public ApiResponse<PointResponseDto> getUserPoints(@PathVariable String userId) {
         Integer points = pointService.getPoint(userId);
 
         PointResponseDto pointResponseDto = new PointResponseDto(userId, points);
