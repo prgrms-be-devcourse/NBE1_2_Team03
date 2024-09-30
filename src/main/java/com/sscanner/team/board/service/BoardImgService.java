@@ -8,9 +8,4 @@ import java.util.List;
 
 public interface BoardImgService {
     List<BoardImg> saveBoardImg(Board board, List<MultipartFile> files);
-
-    String makeImgUrl(MultipartFile file);
-    void isExistFile(MultipartFile file);
-    String separateExt(String originalFileName);
-    void uploadS3(MultipartFile file, String fileName);
 }
