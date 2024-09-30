@@ -24,7 +24,11 @@ public enum ExceptionCode {
 
     //BAD REQUEST
     NOT_EXIST_TRASHCAN_ID(400, "해당하는 쓰레기통이 존재하지 않습니다."),
-
+    DUPLICATED_EMAIL(409, "이미 가입된 이메일입니다. "),
+    DUPLICATED_NICKNAME(409, "이미 가입된 닉네임입니다. "),
+    DUPLICATED_PHONE(409, "이미 가입된 핸드폰 번호입니다. "),
+    PASSWORD_NOT_MATCH(400, "비밀번호와 비밀번호 확인이 일치하지 않습니다."),
+    USER_NOT_FOUND(400,"해당 유저가 존재하지 않습니다.");
     ;
 
     private final int code;
