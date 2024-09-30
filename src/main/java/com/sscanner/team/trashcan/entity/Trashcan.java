@@ -1,7 +1,6 @@
 package com.sscanner.team.trashcan.entity;
 
 import com.sscanner.team.global.common.BaseEntity;
-import com.sscanner.team.trashcan.requestDto.UpdateTrashcanRequestDto;
 import com.sscanner.team.trashcan.type.TrashCategory;
 import com.sscanner.team.trashcan.type.TrashcanStatus;
 import jakarta.persistence.*;
@@ -9,14 +8,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 
-
-@SQLDelete(sql = "UPDATE trashcan SET deleted_at = NOW() WHERE trashcan_id = ?")
-@SQLRestriction("deleted_at is NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
@@ -58,11 +53,4 @@ public class Trashcan extends BaseEntity {
         this.trashcanStatus = TrashcanStatus.EMPTY;
     }
 
-    public void updateInfo(UpdateTrashcanRequestDto requestDto) {
-        this.latitude = requestDto.latitude();
-        this.longitude = requestDto.longitude();
-        this.roadNameAddress = requestDto.roadNameAddress();
-        this.detailedAddress = requestDto.detailedAddress();
-        this.trashCategory = requestDto.trashCategory();
-    }
 }
