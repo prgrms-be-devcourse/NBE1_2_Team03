@@ -5,7 +5,6 @@ spring:
     username: ${HOME_USERNAME}
     password: ${HOME_PASSWORD}
 
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -22,3 +21,7 @@ aws:
   secret-key: ${AWS_SECRET_KEY}
   region.static: ${AWS_REGION}
 
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE

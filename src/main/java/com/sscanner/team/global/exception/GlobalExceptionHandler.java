@@ -1,9 +1,5 @@
 package com.sscanner.team.global.exception;
 
-
-
-
-
 import com.sscanner.team.global.common.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
