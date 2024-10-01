@@ -9,4 +9,5 @@ import java.util.List;
 public interface BoardService {
     BoardCreateResponseDTO createBoard(BoardCreateRequestDTO boardCreateRequestDTO,
                                           List<MultipartFile> files);
+    void deleteBoard(Long boardId);
 }

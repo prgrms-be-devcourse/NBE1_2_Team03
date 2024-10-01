@@ -40,4 +40,10 @@ public class BoardServiceImpl implements BoardService{
 
         return BoardCreateResponseDTO.from(savedAddBoard);
     }
+
+    @Transactional
+    @Override
+    public void deleteBoard(Long boardId) {
+        boardRepository.deleteById(boardId);
+    }
 }

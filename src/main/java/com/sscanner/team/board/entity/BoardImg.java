@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -12,6 +14,8 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Table(name = "Board_img")
 @NoArgsConstructor(access = PROTECTED)
+@SQLRestriction("deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE board_img SET deleted_at = NOW() WHERE board_img_id = ?")
 public class BoardImg extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_img_id", nullable = false)
