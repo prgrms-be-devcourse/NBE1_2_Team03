@@ -4,6 +4,7 @@ import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.trashcan.entity.Trashcan;
 import com.sscanner.team.trashcan.repository.TrashcanRepository;
 import com.sscanner.team.trashcan.requestDto.RegisterTrashcanRequestDto;
+import com.sscanner.team.trashcan.requestDto.UpdateTrashcanRequestDto;
 import com.sscanner.team.trashcan.responseDto.TrashcanResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import static com.sscanner.team.global.exception.ExceptionCode.NOT_EXIST_TRASHCA
 
 @RequiredArgsConstructor
 @Service
-public class TrashcanServiceImpl implements TrashService{
+public class TrashcanServiceImpl implements TrashcanService {
 
     private final TrashcanRepository trashcanRepository;
 
@@ -29,12 +30,16 @@ public class TrashcanServiceImpl implements TrashService{
     }
 
     @Override
-    public TrashcanResponseDto getTrashcanInfoById(Long trashcanId) {
+    public TrashcanResponseDto getTrashcanInfo(Long trashcanId) {
 
-        Trashcan trashcan = trashcanRepository.findById(trashcanId)
-                .orElseThrow(() -> new BadRequestException(NOT_EXIST_TRASHCAN_ID));
+        Trashcan trashcan = getTrashcanById(trashcanId);
 
         return TrashcanResponseDto.from(trashcan);
+    }
+
+    private Trashcan getTrashcanById(Long trashcanId) {
+        return trashcanRepository.findById(trashcanId)
+                .orElseThrow(() -> new BadRequestException(NOT_EXIST_TRASHCAN_ID));
     }
 
     @Override
@@ -52,14 +57,18 @@ public class TrashcanServiceImpl implements TrashService{
         return null;
     }
 
-    @Override
-    public TrashcanResponseDto updateTrashcan() {
-        return null;
+
+    @Transactional
+    public void deleteTrashcanInfo(Long trashcanId) {
+        Trashcan trashcan = getTrashcanById(trashcanId);
+        trashcanRepository.delete(trashcan);
     }
 
-    @Override
-    public TrashcanResponseDto deleteTrashcan() {
-        return null;
+    @Transactional
+    public TrashcanResponseDto updateTrashcanInfo(Long trashcanId, UpdateTrashcanRequestDto requestDto) {
+        Trashcan trashcan = getTrashcanById(trashcanId);
+        trashcan.updateInfo(requestDto);
+        return TrashcanResponseDto.from(trashcan);
     }
 
 
