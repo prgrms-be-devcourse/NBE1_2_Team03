@@ -8,23 +8,23 @@ import com.sscanner.team.trashcan.type.TrashcanStatus;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record BoardCreateResponseDTO(
+public record BoardResponseDTO(
     Long id,
     Long trashcanId,
     BoardCategory boardCategory,
     String significant,
     TrashcanStatus updatedTrashcanStatus,
-    List<BoardImgCreateResponseDTO> boardImgs
+    List<BoardImgResponseDTO> boardImgs
 ) {
-    public static BoardCreateResponseDTO from(Board board) {
-        return new BoardCreateResponseDTO(
+    public static BoardResponseDTO from(Board board, List<BoardImg> boardImgs) {
+        return new BoardResponseDTO(
                 board.getId(),
                 board.getTrashcanId(),
                 board.getBoardCategory(),
                 board.getSignificant(),
                 board.getUpdatedTrashcanStatus(),
-                board.getBoardImgs().stream()
-                        .map((BoardImg boardImg) -> BoardImgCreateResponseDTO.of(boardImg))
+                boardImgs.stream()
+                        .map((BoardImg boardImg) -> BoardImgResponseDTO.of(boardImg))
                         .collect(Collectors.toList())
         );
     }
