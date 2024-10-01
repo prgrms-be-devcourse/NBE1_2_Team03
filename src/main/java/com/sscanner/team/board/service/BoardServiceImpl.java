@@ -5,12 +5,17 @@ import com.sscanner.team.board.entity.BoardImg;
 import com.sscanner.team.board.repository.BoardRepository;
 import com.sscanner.team.board.requestdto.BoardCreateRequestDTO;
 import com.sscanner.team.board.responsedto.BoardCreateResponseDTO;
+import com.sscanner.team.global.exception.BadRequestException;
+import com.sscanner.team.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
+
+import static com.sscanner.team.global.exception.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +49,16 @@ public class BoardServiceImpl implements BoardService{
     @Transactional
     @Override
     public void deleteBoard(Long boardId) {
-        boardRepository.deleteById(boardId);
+        Board board = getBoard(boardId);
+
+        boardRepository.delete(board);
     }
+
+    @Override
+    public Board getBoard(Long boardId) {
+        return boardRepository
+                .findById(boardId)
+                .orElseThrow(() -> new BadRequestException(NOT_EXIST_BOARD));
+    }
+
 }
