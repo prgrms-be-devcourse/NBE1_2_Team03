@@ -25,4 +25,11 @@ public class BoardController {
 
         return ApiResponse.ok(201, board, "쓰레기통 신고 게시글 저장 완료!!");
     }
+
+    @DeleteMapping("/{boardId}")
+    public ApiResponse<?> deleteBoard(@PathVariable Long boardId) {
+        boardService.deleteBoard(boardId);
+
+        return ApiResponse.ok(200, "게시판 삭제 완료!!");
+    }
 }

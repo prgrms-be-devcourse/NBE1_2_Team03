@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.sscanner.team.global.exception.ExceptionCode.*;
@@ -62,13 +64,16 @@ public class ImageServiceImpl implements ImageService{
      */
     @Override
     public String separateExt(String originalFileName) {
-        String ext = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+        Set<String> exts = new HashSet<>(){{
+            add("jpg");
+            add("HEIC");
+            add("jpeg");
+            add("png");
+            add("heic");
+        }};
 
-        if (!(ext.equals("jpg")
-                || ext.equals("HEIC")
-                || ext.equals("jpeg")
-                || ext.equals("png")
-                || ext.equals("heic"))) {
+        String ext = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+        if (!exts.contains(ext)) {
             throw new BadRequestException(BAD_FILE_EXTENSION);
         }
         return ext;
