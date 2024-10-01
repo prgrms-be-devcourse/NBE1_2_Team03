@@ -3,15 +3,12 @@ package com.sscanner.team.points.service;
 import com.sscanner.team.UserPoint;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
-import com.sscanner.team.points.repository.PointRepository;
+import com.sscanner.team.points.common.PointManager;
+import com.sscanner.team.points.requestdto.PointRequestDto;
 import com.sscanner.team.points.responsedto.PointResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static com.sscanner.team.points.common.PointConstants.*;
 
@@ -19,65 +16,50 @@ import static com.sscanner.team.points.common.PointConstants.*;
 @RequiredArgsConstructor
 public class PointServiceImpl implements PointService {
 
-    private final PointRepository pointRepository;
-    private final RedisTemplate<String, Integer> redisTemplate;
+    private final PointManager pointManager;
 
     /**
      * 사용자 포인트를 조회합니다.
      * @param userId 사용자 ID
-     * @return 사용자 Point
+     * @return PointResponseDto 사용자 Point
      */
     @Override
-    public Integer getPoint(String userId) {
-        String key = POINT_PREFIX + userId;
-        Integer point = redisTemplate.opsForValue().get(key);
+    public PointResponseDto getPoint(String userId) {
+        Integer point = pointManager.getPointFromRedis(userId);
 
         if (point == null) {
-            UserPoint userPoint = pointRepository.findByUserId(userId)
-                    .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
+            UserPoint userPoint = pointManager.findUserPointByUserId(userId);
             point = userPoint.getPoint();
-            redisTemplate.opsForValue().set(key, point, 1, TimeUnit.DAYS);
+            pointManager.updatePointInRedis(userId, point);
         }
 
-        return point;
+        return PointResponseDto.of(userId, point);
     }
 
     /**
      * 사용자에게 포인트를 제공합니다.
-     * @param userId 사용자 ID
-     * @param point 추가할 Point
-     * @return 사용자 ID, 변경된 사용자 Point
+     * @param pointRequestDto 사용자 ID, 추가할 Point
+     * @return pointResponseDto 사용자 ID, 변경된 사용자 Point
      */
     @Transactional
     @Override
-    public PointResponseDto addPoint(String userId, Integer point) {
-        String key = POINT_PREFIX + userId;
-        String dailyKey = DAILY_POINT_PREFIX + userId;
+    public PointResponseDto addPoint(PointRequestDto pointRequestDto) {
+        String userId = pointRequestDto.userId();
+        Integer point = pointRequestDto.point();
 
-//        Integer currentPoint = getCachedPoint(key);
-//        if (currentPoint == null) {
-//            currentPoint = getPoint(userId);
-//        }
+        Integer dailyPoint = pointManager.getDailyPointFromRedis(userId);
+        validateDailyLimitPoints(dailyPoint, point);
 
-        Integer dailyPoint = getCachedPoint(dailyKey);
+        pointManager.incrementPointInRedis(userId, point);
+        pointManager.incrementDailyPointInRedis(userId, point);
 
+        Integer updatedPoint = pointManager.getPointFromRedis(userId);
+        return PointResponseDto.of(userId, updatedPoint);
+    }
+
+    private static void validateDailyLimitPoints(Integer dailyPoint, Integer point) {
         if (dailyPoint + point > DAILY_LIMIT) {
             throw new BadRequestException(ExceptionCode.DAILY_POINTS_EXCEEDED);
         }
-
-        redisTemplate.opsForValue().increment(key, point);
-        redisTemplate.opsForValue().increment(dailyKey, point);
-
-        Integer updatedPoint = redisTemplate.opsForValue().get(key);
-        return new PointResponseDto(userId, updatedPoint);
-    }
-
-    /**
-     * Redis에서 캐싱된 포인트 가져오기. 값이 null일 경우 0 반환.
-     * @param key Redis Key
-     * @return Point
-     */
-    private Integer getCachedPoint(String key) {
-        return Optional.ofNullable(redisTemplate.opsForValue().get(key)).orElse(0);
     }
 }

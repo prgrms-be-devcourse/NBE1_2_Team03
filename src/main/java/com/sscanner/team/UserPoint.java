@@ -2,13 +2,13 @@ package com.sscanner.team;
 
 import com.sscanner.team.global.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 
-@Getter @Setter
+@Getter
 @Entity
 @Table(name = "User_point")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserPoint extends BaseEntity {
     @Id
     @Column(name = "user_point_id", nullable = false, length = 16)
@@ -21,5 +21,18 @@ public class UserPoint extends BaseEntity {
     @Column(name = "point", nullable = false)
     private Integer point;
 
+    @Builder
+    public UserPoint(String userPointId, User user, Integer point) {
+        this.userPointId = userPointId;
+        this.user = user;
+        this.point = point;
+    }
 
+    public UserPoint updatePoint(Integer newPoint) {
+        return UserPoint.builder()
+                .userPointId(this.userPointId)
+                .user(this.user)
+                .point(newPoint)
+                .build();
+    }
 }

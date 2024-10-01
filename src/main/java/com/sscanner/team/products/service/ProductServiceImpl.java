@@ -10,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 @Service
 @RequiredArgsConstructor
@@ -18,15 +21,22 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
-    public Page<ProductResponseDto> getAllProducts(Pageable pageable) {
-        return productRepository.findAll(pageable)
-                .map(product -> new ProductResponseDto(product.getId(), product.getProductName(), product.getPrice()));
+    public Map<String, Object> getAllProducts(Pageable pageable) {
+        Page<ProductResponseDto> products = productRepository.findAll(pageable).map(ProductResponseDto::of);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("products", products.getContent());
+        response.put("currentPage", products.getNumber() + 1);
+        response.put("totalItems", products.getTotalElements());
+        response.put("totalPages", products.getTotalPages());
+
+        return response;
     }
 
     @Override
     public ProductResponseDto getProductById(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_PRODUCT_ID));
-        return new ProductResponseDto(product.getId(), product.getProductName(), product.getPrice());
+        return ProductResponseDto.of(product);
     }
 }

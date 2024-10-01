@@ -1,9 +1,11 @@
 package com.sscanner.team.points.controller;
 
 import com.sscanner.team.global.common.response.ApiResponse;
+import com.sscanner.team.points.requestdto.PointPaymentRequestDto;
+import com.sscanner.team.points.requestdto.PointRequestDto;
 import com.sscanner.team.points.responsedto.PointResponseDto;
-import com.sscanner.team.points.service.PaymentServiceImpl;
-import com.sscanner.team.points.service.PointServiceImpl;
+import com.sscanner.team.points.service.PaymentService;
+import com.sscanner.team.points.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/points")
 public class PointController {
 
-    private final PointServiceImpl pointService;
-    private final PaymentServiceImpl paymentService;
+    private final PointService pointService;
+    private final PaymentService paymentService;
 
     /**
      * 사용자의 현재 포인트를 조회하는 API
@@ -23,42 +25,29 @@ public class PointController {
      */
     @GetMapping("/{userId}")
     public ApiResponse<PointResponseDto> getUserPoints(@PathVariable String userId) {
-        Integer points = pointService.getPoint(userId);
-
-        PointResponseDto pointResponseDto = new PointResponseDto(userId, points);
-
+        PointResponseDto pointResponseDto = pointService.getPoint(userId);
         return ApiResponse.ok(200, pointResponseDto, "사용자 포인트 조회 성공");
     }
 
     /**
      * 사용자의 포인트를 추가하는 API
-     * @param userId 사용자 ID
-     * @param points 추가할 포인트
+     * @param pointRequestDto 사용자 ID, 추가할 포인트
      * @return 포인트 추가 성공 메시지
      */
-    @PostMapping("/{userId}/add")
-    public ApiResponse<PointResponseDto> addUserPoints(
-            @PathVariable String userId,
-            @RequestParam Integer points) {
-
-        PointResponseDto response = pointService.addPoint(userId, points);
-
+    @PostMapping("/add")
+    public ApiResponse<PointResponseDto> addUserPoints(@RequestBody PointRequestDto pointRequestDto) {
+        PointResponseDto response = pointService.addPoint(pointRequestDto);
         return ApiResponse.ok(201, response, "포인트가 성공적으로 추가되었습니다.");
     }
 
     /**
      * 사용자의 포인트를 사용하는 API
-     * @param userId 사용자 ID
-     * @param productId 상품 ID
+     * @param pointPaymentRequestDto 사용자 ID, 상품 ID
      * @return 포인트 사용 성공 메시지
      */
-    @PostMapping("/{userId}/pay/{productId}")
-    public ApiResponse<PointResponseDto> payUserPoints(
-            @PathVariable String userId,
-            @PathVariable Long productId) {
-
-        PointResponseDto response = paymentService.payPoint(userId, productId);
-
+    @PostMapping("/pay")
+    public ApiResponse<PointResponseDto> payUserPoints(@RequestBody PointPaymentRequestDto pointPaymentRequestDto) {
+        PointResponseDto response = paymentService.payPoint(pointPaymentRequestDto);
         return ApiResponse.ok(201, response, "포인트가 성공적으로 사용되었습니다.");
     }
 }

@@ -1,10 +1,11 @@
 package com.sscanner.team.products.service;
 
 import com.sscanner.team.products.responsedto.ProductResponseDto;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Map;
+
 public interface ProductService {
-    Page<ProductResponseDto> getAllProducts(Pageable pageable);
+    Map<String, Object> getAllProducts(Pageable pageable);
     ProductResponseDto getProductById(Long productId);
 }

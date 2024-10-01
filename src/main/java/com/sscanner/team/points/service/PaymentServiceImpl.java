@@ -2,71 +2,83 @@ package com.sscanner.team.points.service;
 
 import com.sscanner.team.PaymentRecord;
 import com.sscanner.team.Product;
+import com.sscanner.team.User;
 import com.sscanner.team.UserPoint;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
+import com.sscanner.team.points.common.PointManager;
 import com.sscanner.team.points.repository.PaymentRepository;
-import com.sscanner.team.points.repository.PointRepository;
+import com.sscanner.team.points.requestdto.PaymentRequestDto;
+import com.sscanner.team.points.requestdto.PointPaymentRequestDto;
 import com.sscanner.team.points.responsedto.PointResponseDto;
 import com.sscanner.team.products.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
-import static com.sscanner.team.points.common.PointConstants.POINT_PREFIX;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
-    private final PointRepository pointRepository;
+
+    private final PointManager pointManager;
     private final ProductRepository productRepository;
     private final PaymentRepository paymentRepository;
-    private final RedisTemplate<String, Integer> redisTemplate;
 
     /**
-     * 포인트로 제품을 구매할 수 있습니다.
-     * @param userId 사용자 ID
-     * @param productId 결제할 상품의 ID
-     * @return 사용자 ID, 결제 이후의 사용자 Point
+     * 포인트로 제품을 구매할 수 있습니다.*
+     * @param pointPaymentRequestDto 사용자 ID, 결제할 상품의 ID
+     * @return PointResponseDto 사용자 ID, 결제 이후의 사용자 Point
      */
     @Transactional
-    public PointResponseDto payPoint(String userId, Long productId) {
-        String key = POINT_PREFIX + userId;
+    @Override
+    public PointResponseDto payPoint(PointPaymentRequestDto pointPaymentRequestDto) {
+        String userId = pointPaymentRequestDto.userId();
+        Long productId = pointPaymentRequestDto.productId();
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_ITEM_ID));
-        UserPoint userPoint = pointRepository.findByUserId(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
-
+        Product product = findByProductId(productId);
+        UserPoint userPoint = pointManager.findUserPointByUserId(userId);
         Integer productPrice = product.getPrice();
 
         // Redis에서 총 포인트 가져오기
-        Integer currentPoint = redisTemplate.opsForValue().get(key);
+        Integer currentPoint = pointManager.getPointFromRedis(userId);
+        validateEnoughPoints(currentPoint, productPrice);
+
+        // Redis에서 포인트 차감
+        pointManager.decrementPointInRedis(userId, productPrice);
+
+        processPaymentAsync(userPoint, product, productPrice, currentPoint);
+
+        Integer updatedPoint = pointManager.getPointFromRedis(userId);
+        return PointResponseDto.of(userId, updatedPoint);
+    }
+
+    private void processPaymentAsync(UserPoint userPoint, Product product, Integer productPrice, Integer currentPoint) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                PaymentRequestDto paymentRequestDto = PaymentRequestDto.of(userPoint.getUser(), product, productPrice);
+                savePayment(paymentRequestDto, userPoint.getUser(), product);
+                pointManager.updateUserPointsInDb(userPoint, currentPoint - productPrice);
+            } catch (Exception e) {
+                throw new RuntimeException("비동기 작업 중 오류 발생", e);
+            }
+        });
+    }
+
+    private void savePayment(PaymentRequestDto paymentRequestDto, User user, Product product) {
+        PaymentRecord paymentRecord = paymentRequestDto.toEntity(user, product);
+        paymentRepository.save(paymentRecord);
+    }
+
+    private void validateEnoughPoints(Integer currentPoint, Integer productPrice) {
         if (currentPoint == null || currentPoint < productPrice) {
             throw new BadRequestException(ExceptionCode.NOT_ENOUGH_POINTS);
         }
+    }
 
-        // Redis에서 포인트 차감
-        redisTemplate.opsForValue().decrement(key, productPrice);
-
-        CompletableFuture.runAsync(() -> {
-            PaymentRecord paymentRecord = new PaymentRecord();
-            paymentRecord.setPaymentRecordId(UUID.randomUUID());
-            paymentRecord.setUser(userPoint.getUser());
-            paymentRecord.setProduct(product);
-            paymentRecord.setPayment(productPrice);
-
-            paymentRepository.save(paymentRecord);
-
-            userPoint.setPoint(currentPoint - productPrice);
-            pointRepository.save(userPoint);
-        });
-
-        Integer updatedPoint = redisTemplate.opsForValue().get(key);
-        return new PointResponseDto(userId, updatedPoint);
+    private Product findByProductId(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_ITEM_ID));
     }
 }
