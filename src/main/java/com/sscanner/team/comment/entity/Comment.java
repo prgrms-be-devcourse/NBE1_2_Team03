@@ -1,12 +1,10 @@
-package com.sscanner.team;
+package com.sscanner.team.comment.entity;
 
+import com.sscanner.team.User;
+import com.sscanner.team.board.entity.Board;
 import com.sscanner.team.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-
-import java.time.Instant;
 
 @Getter
 @Entity
