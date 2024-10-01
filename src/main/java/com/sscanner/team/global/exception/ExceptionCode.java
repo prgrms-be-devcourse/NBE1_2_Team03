@@ -42,7 +42,7 @@ public enum ExceptionCode {
     NOT_ENOUGH_POINTS(400, "사용 가능한 포인트가 부족합니다."),
     DAILY_POINTS_EXCEEDED(400, "일일 획득 포인트를 초과했습니다."),
 
-    FILE_UPLOAD_FAIL(400,  "파일 업로드를 실패하였습니다.")
+    FILE_UPLOAD_FAIL(400,  "파일 업로드를 실패하였습니다."),
 
     DUPLICATED_EMAIL(409, "이미 가입된 이메일입니다. "),
     DUPLICATED_NICKNAME(409, "이미 가입된 닉네임입니다. "),

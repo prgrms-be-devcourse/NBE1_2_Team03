@@ -32,8 +32,8 @@ public class PointScheduler {
                     CompletableFuture.runAsync(() -> {
                         UserPoint userPoint = pointRepository.findByUserId(userId)
                                 .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
-                        userPoint.setPoint(currentPoint);
-                        pointRepository.save(userPoint);
+                        UserPoint updatedUserPoint = userPoint.updatePoint(currentPoint);
+                        pointRepository.save(updatedUserPoint);
                     });
                 }
             }
