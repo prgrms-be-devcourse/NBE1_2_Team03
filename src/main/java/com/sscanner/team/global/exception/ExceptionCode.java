@@ -34,6 +34,7 @@ public enum ExceptionCode {
     //BAD REQUEST
     NOT_EXIST_TRASHCAN_ID(400, "해당하는 쓰레기통이 존재하지 않습니다."),
     NOT_EXIST_FILE(400, "파일이 비어있습니다."),
+    NOT_EXIST_BOARD(400, "해당하는 게시글이 존재하지 않습니다."),
     NOT_FOUND_PRODUCT_ID(400, "해당하는 상품이 존재하지 않습니다."),
     NOT_FOUND_USER_ID(400, "해당 사용자를 찾을 수 없습니다."),
     NOT_FOUND_ITEM_ID(400, "해당 주문에 상품이 존재하지 않습니다."),
@@ -42,6 +43,7 @@ public enum ExceptionCode {
     DAILY_POINTS_EXCEEDED(400, "일일 획득 포인트를 초과했습니다."),
 
     FILE_UPLOAD_FAIL(400,  "파일 업로드를 실패하였습니다.")
+
     DUPLICATED_EMAIL(409, "이미 가입된 이메일입니다. "),
     DUPLICATED_NICKNAME(409, "이미 가입된 닉네임입니다. "),
     DUPLICATED_PHONE(409, "이미 가입된 핸드폰 번호입니다. "),

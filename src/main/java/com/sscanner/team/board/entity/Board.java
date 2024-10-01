@@ -9,6 +9,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,6 +21,8 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @Entity
 @NoArgsConstructor(access = PROTECTED)
+@SQLRestriction("deleted_at IS NULL")
+@SQLDelete(sql = "UPDATE board SET deleted_at = NOW() WHERE board_id = ?")
 public class Board extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id", nullable = false)
