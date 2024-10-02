@@ -1,6 +1,9 @@
-package com.sscanner.team.config;
+package com.sscanner.team.global.configure;
 
+import com.sscanner.team.jwt.JWTFilter;
+import com.sscanner.team.jwt.JWTUtil;
 import com.sscanner.team.jwt.LoginFilter;
+import com.sscanner.team.user.repository.RefreshRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JWTUtil jwtUtil;
+    private final RefreshRepository refreshRepository;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -39,13 +44,16 @@ public class SecurityConfig {
         // 경로별 인가
         http.authorizeHttpRequests((authorize)->
                 authorize.requestMatchers("/**").permitAll()
+                        .requestMatchers("/reissue").permitAll()
 
 //                authorize.requestMatchers("/login","/","/join").permitAll()
 //                        .requestMatchers("/admin").hasRole("ADMIN")
+//                        .requestMatchers("/reissue").permitAll()
 //                        .anyRequest().authenticated()
         );
 
-        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(new JWTFilter(jwtUtil), LoginFilter.class);
+        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshRepository), UsernamePasswordAuthenticationFilter.class);
 
         http .sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
