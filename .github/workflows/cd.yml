@@ -8,7 +8,53 @@ on:
 jobs:
   Continuous-Deployment:
     runs-on: ubuntu-latest
+    env:
+      # 임시 데이터베이스 환경변수(추후 RDS로 전환할 예정)
+      HOME_URL: ${{ secrets.HOME_URL }}
+      HOME_USERNAME: ${{ secrets.HOME_USERNAME }}
+      HOME_PASSWORD: ${{ secrets.HOME_PASSWORD }}
+      # AWS 환경변수
+      AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ap-northeast-2
+      # Redis 환경변수
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PORT: 6379
+      # Bucker 환경변수
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME}}
+      BASE_URL: ${{ secrets.BASE_URL }}
+
     steps:
+      - name: Github Repository 파일 불러오기
+        uses: actions/checkout@v4
+
+      - name: JDK 17 버전 설치
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Gradle 캐싱
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 빌드 권한 부여
+        run: chmod +x ./gradlew
+        shell: bash
+
+      - name: 빌드 및 테스트
+        run: ./gradlew clean build
       - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
         uses: aws-actions/configure-aws-credentials@v4
         with:
