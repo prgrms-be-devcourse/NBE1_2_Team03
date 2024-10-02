@@ -1,7 +1,7 @@
 package com.sscanner.team.points.requestdto;
 
-import com.sscanner.team.PaymentRecord;
-import com.sscanner.team.Product;
+import com.sscanner.team.points.entity.PaymentRecord;
+import com.sscanner.team.products.entity.Product;
 import com.sscanner.team.User;
 
 import java.util.UUID;

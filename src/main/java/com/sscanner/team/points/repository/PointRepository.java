@@ -1,6 +1,6 @@
 package com.sscanner.team.points.repository;
 
-import com.sscanner.team.UserPoint;
+import com.sscanner.team.points.entity.UserPoint;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

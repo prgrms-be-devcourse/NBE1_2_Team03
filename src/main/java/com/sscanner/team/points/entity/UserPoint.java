@@ -1,5 +1,6 @@
-package com.sscanner.team;
+package com.sscanner.team.points.entity;
 
+import com.sscanner.team.User;
 import com.sscanner.team.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;

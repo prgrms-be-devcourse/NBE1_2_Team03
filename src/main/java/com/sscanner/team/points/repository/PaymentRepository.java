@@ -1,6 +1,6 @@
 package com.sscanner.team.points.repository;
 
-import com.sscanner.team.PaymentRecord;
+import com.sscanner.team.points.entity.PaymentRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PaymentRepository extends JpaRepository<PaymentRecord, String> {

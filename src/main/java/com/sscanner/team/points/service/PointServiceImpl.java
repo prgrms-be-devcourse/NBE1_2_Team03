@@ -1,6 +1,6 @@
 package com.sscanner.team.points.service;
 
-import com.sscanner.team.UserPoint;
+import com.sscanner.team.points.entity.UserPoint;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.points.common.PointManager;

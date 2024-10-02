@@ -1,6 +1,6 @@
 package com.sscanner.team.products.service;
 
-import com.sscanner.team.Product;
+import com.sscanner.team.products.entity.Product;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.products.repository.ProductRepository;

@@ -1,6 +1,6 @@
 package com.sscanner.team.products.responsedto;
 
-import com.sscanner.team.Product;
+import com.sscanner.team.products.entity.Product;
 
 public record ProductResponseDto(
     Long productId,

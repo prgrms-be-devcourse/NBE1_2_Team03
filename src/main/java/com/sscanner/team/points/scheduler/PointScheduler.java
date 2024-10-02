@@ -1,6 +1,6 @@
 package com.sscanner.team.points.scheduler;
 
-import com.sscanner.team.UserPoint;
+import com.sscanner.team.points.entity.UserPoint;
 import com.sscanner.team.points.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
