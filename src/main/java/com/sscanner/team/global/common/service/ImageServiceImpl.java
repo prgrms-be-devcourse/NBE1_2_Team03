@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.util.IOUtils;
 import com.sscanner.team.global.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,9 +22,11 @@ import static com.sscanner.team.global.exception.ExceptionCode.*;
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService{
 
-    private final AmazonS3 amazonS3;
-    private static final String BASE_URL = "https://sscanner-bucket.s3.ap-northeast-2.amazonaws.com";
-    private static final String BUCKET = "sscanner-bucket";
+    private final AmazonS3 s3Client;
+    @Value("${sscanner.bucket.base-url}")
+    private String baseUrl;
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
 
     /**
      * 이미지 url 생성
@@ -43,7 +46,7 @@ public class ImageServiceImpl implements ImageService{
 
         uploadS3(file, fileName); // S3에 이미지 업로드
 
-        return BASE_URL + "/" + fileName;
+        return baseUrl + "/" + fileName;
     }
 
     /**
@@ -93,8 +96,8 @@ public class ImageServiceImpl implements ImageService{
             objMeta.setContentLength(bytes.length); // 파일의 크기
 
             // PutObjectRequest를 사용하여 지정된 S3 버킷에 파일을 업로드
-            amazonS3.putObject(
-                    new PutObjectRequest(BUCKET, fileName, file.getInputStream(), objMeta)
+            s3Client.putObject(
+                    new PutObjectRequest(bucket, fileName, file.getInputStream(), objMeta)
                             .withCannedAcl(CannedAccessControlList.PublicRead)); // ACL을 PublicRead로 하여 공용으로 읽을 수 있도록 권한 부여
         } catch (IOException e) {
             throw new BadRequestException(FILE_UPLOAD_FAIL);
