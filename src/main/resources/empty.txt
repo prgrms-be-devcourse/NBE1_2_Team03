@@ -1,0 +1,1 @@
+github actions가 resources 디렉토리가 인식못해서 추가한 파일
