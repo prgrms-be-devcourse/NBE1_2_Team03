@@ -10,6 +10,7 @@ services:
       - HOME_PASSWORD
       - AWS_ACCESS_KEY
       - AWS_SECRET_KEY
+      - AWS_REGION
       - REDIS_HOST
       - REDIS_PORT
       - BUCKET_NAME
