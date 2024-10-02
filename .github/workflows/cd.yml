@@ -77,9 +77,9 @@ jobs:
 
       - name: .env 파일 작성
         run: |
-          echo "DB_HOST=${{ secrets.HOME_URL }}" >> docker-compose/.env
-          echo "DB_USERNAME=${{ secrets.HOME_USERNAME }}" >> docker-compose/.env
-          echo "DB_PASSWORD=${{ secrets.HOME_PASSWORD }}" >> docker-compose/.env
+          echo "HOME_URL=${{ secrets.HOME_URL }}" >> docker-compose/.env
+          echo "HOME_USERNAME=${{ secrets.HOME_USERNAME }}" >> docker-compose/.env
+          echo "HOME_PASSWORD=${{ secrets.HOME_PASSWORD }}" >> docker-compose/.env
           echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> docker-compose/.env
           echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> docker-compose/.env
           echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> docker-compose/.env
