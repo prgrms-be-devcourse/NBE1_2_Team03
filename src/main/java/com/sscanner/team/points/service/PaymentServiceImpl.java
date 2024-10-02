@@ -10,6 +10,7 @@ import com.sscanner.team.points.common.PointManager;
 import com.sscanner.team.points.repository.PaymentRepository;
 import com.sscanner.team.points.requestdto.PaymentRequestDto;
 import com.sscanner.team.points.requestdto.PointPaymentRequestDto;
+import com.sscanner.team.points.requestdto.PointUpdateRequestDto;
 import com.sscanner.team.points.responsedto.PointResponseDto;
 import com.sscanner.team.products.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +60,14 @@ public class PaymentServiceImpl implements PaymentService {
             try {
                 PaymentRequestDto paymentRequestDto = PaymentRequestDto.of(userPoint.getUser(), product, productPrice);
                 savePayment(paymentRequestDto, userPoint.getUser(), product);
-                pointManager.updateUserPointsInDb(userPoint, currentPoint - productPrice);
+
+                PointUpdateRequestDto pointUpdateRequestDto = PointUpdateRequestDto.of(
+                        userPoint.getUserPointId(),
+                        userPoint.getUser(),
+                        currentPoint - productPrice
+                );
+
+                pointManager.updateUserPointsInDb(pointUpdateRequestDto);
             } catch (Exception e) {
                 throw new RuntimeException("비동기 작업 중 오류 발생", e);
             }

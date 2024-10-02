@@ -4,9 +4,11 @@ import com.sscanner.team.UserPoint;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.points.repository.PointRepository;
+import com.sscanner.team.points.requestdto.PointUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -26,9 +28,10 @@ public class PointManager {
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
     }
 
-    public void updateUserPointsInDb(UserPoint userPoint, Integer newPoint) {
-        UserPoint updatePoint = userPoint.updatePoint(newPoint);
-        pointRepository.save(updatePoint);
+    @Transactional
+    public void updateUserPointsInDb(PointUpdateRequestDto pointUpdateRequestDto) {
+        UserPoint updatedUserPoint = pointUpdateRequestDto.toEntity();
+        pointRepository.save(updatedUserPoint);
     }
 
     public Integer getPointFromRedis(String userId) {
