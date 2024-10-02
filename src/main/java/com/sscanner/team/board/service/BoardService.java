@@ -21,6 +21,7 @@ public interface BoardService {
                                  List<MultipartFile> files);
     Page<BoardListResponseDTO> getBoardList(BoardCategory boardCategory, TrashCategory trashCategory,
                                          Integer page, Integer size);
+    BoardResponseDTO getBoardDetailed(Long boardId);
 
     Board getBoard(Long boardId);
 }

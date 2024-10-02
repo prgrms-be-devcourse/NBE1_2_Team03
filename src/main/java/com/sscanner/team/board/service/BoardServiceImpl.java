@@ -114,6 +114,20 @@ public class BoardServiceImpl implements BoardService{
         return boards.map(board -> BoardListResponseDTO.of(board));
     }
 
+    /**
+     * 게시글 상세 조회
+     * @param boardId - 게시글 id
+     * @return BoardResponseDTO
+     */
+    @Override
+    public BoardResponseDTO getBoardDetailed(Long boardId) {
+        Board board = getBoard(boardId);
+
+        List<BoardImg> boardImgs = boardImgService.getBoardImgs(boardId);
+
+        return BoardResponseDTO.from(board, boardImgs);
+    }
+
     @Override
     public Board getBoard(Long boardId) {
         return boardRepository

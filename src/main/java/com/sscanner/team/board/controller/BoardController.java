@@ -57,4 +57,11 @@ public class BoardController {
 
         return ApiResponse.ok(200, boards, "게시판 목록 조회 완료!!");
     }
+
+    @GetMapping("/{boardId}")
+    public ApiResponse<BoardResponseDTO> readBoard(@PathVariable Long boardId) {
+        BoardResponseDTO boardDetailed = boardService.getBoardDetailed(boardId);
+
+        return ApiResponse.ok(200, boardDetailed, "게시판 상세 정보 조회 완료!!");
+    }
 }
