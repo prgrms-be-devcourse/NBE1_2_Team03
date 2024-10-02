@@ -1,0 +1,6 @@
+services:
+  blue:
+    image: 211125297893.dkr.ecr.ap-northeast-2.amazonaws.com/sscanner-backend
+    container_name: blue-server
+    ports:
+      - "8081:8080"

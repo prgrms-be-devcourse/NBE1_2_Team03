@@ -1,0 +1,6 @@
+services:
+  green:
+    image: 211125297893.dkr.ecr.ap-northeast-2.amazonaws.com/sscanner-backend
+    container_name: green-server
+    ports:
+      - "8082:8080"
