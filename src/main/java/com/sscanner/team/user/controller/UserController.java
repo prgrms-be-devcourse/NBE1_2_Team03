@@ -29,7 +29,5 @@ public class UserController {
         return ApiResponse.ok(201, null, "회원가입 성공");
 
     }
-
-
-
 }
+
