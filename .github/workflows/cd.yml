@@ -82,6 +82,7 @@ jobs:
           echo "HOME_PASSWORD=${{ secrets.HOME_PASSWORD }}" >> docker-compose/.env
           echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> docker-compose/.env
           echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> docker-compose/.env
+          echo "AWS_REGION"=ap-northeast-2
           echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> docker-compose/.env
           echo "REDIS_PORT=6379" >> docker-compose/.env
           echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> docker-compose/.env
