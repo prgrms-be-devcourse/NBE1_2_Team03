@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI-CD Pipeline
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       [ main ]
 
 jobs:
-  Continuous-Deployment:
+  CI-CD:
     runs-on: ubuntu-latest
     env:
       # 임시 데이터베이스 환경변수(추후 RDS로 전환할 예정)
