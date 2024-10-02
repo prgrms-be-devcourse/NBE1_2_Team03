@@ -30,6 +30,7 @@ public enum ExceptionCode {
 
     //Unsupported Media Type
     BAD_FILE_EXTENSION(415, "적절하지 않은 파일 확장자입니다."),
+    INVALID_FILE_NAME(415, "파일 이름이 잘못되었습니다."),
 
     //BAD REQUEST
     NOT_EXIST_TRASHCAN_ID(400, "해당하는 쓰레기통이 존재하지 않습니다."),

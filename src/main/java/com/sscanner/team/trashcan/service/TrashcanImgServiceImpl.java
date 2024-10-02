@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.trashcan.entity.TrashcanImg;
 import com.sscanner.team.trashcan.repository.TrashcanImgRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+
+import static com.sscanner.team.global.exception.ExceptionCode.BAD_FILE_EXTENSION;
+import static com.sscanner.team.global.exception.ExceptionCode.INVALID_FILE_NAME;
 
 @RequiredArgsConstructor
 @Service
@@ -83,20 +87,25 @@ public class TrashcanImgServiceImpl implements TrashcanImgService {
 
     // 파일 유효성 검사
     private String getFileExtension(String fileName) {
-        if (fileName.length() == 0) {
-            throw new IllegalArgumentException("File name cannot be empty");
+        if (fileName == null || fileName.isEmpty()) {
+            throw new BadRequestException(INVALID_FILE_NAME);
         }
-        ArrayList<String> fileValidate = new ArrayList<>();
-        fileValidate.add(".jpg");
-        fileValidate.add(".jpeg");
-        fileValidate.add(".png");
-        fileValidate.add(".JPG");
-        fileValidate.add(".JPEG");
-        fileValidate.add(".PNG");
-        String idxFileName = fileName.substring(fileName.lastIndexOf("."));
-        if (!fileValidate.contains(idxFileName)) {
-            throw new IllegalArgumentException("File extension is not valid");
+
+        Set<String> allowedExtensions = new HashSet<>(Arrays.asList(
+                "jpg", "jpeg", "png", "heic", "HEIC"
+        ));
+
+        int lastDotIndex = fileName.lastIndexOf(".");
+        if (lastDotIndex == -1 || lastDotIndex == fileName.length() - 1) {
+            throw new BadRequestException(INVALID_FILE_NAME);
         }
-        return fileName.substring(fileName.lastIndexOf("."));
+
+        String ext = fileName.substring(lastDotIndex + 1);
+        if (!allowedExtensions.contains(ext)) {
+            throw new BadRequestException(BAD_FILE_EXTENSION);
+        }
+
+        return fileName.substring(lastDotIndex);
     }
+
 }
