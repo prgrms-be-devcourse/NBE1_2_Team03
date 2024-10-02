@@ -13,6 +13,9 @@ if docker ps | grep -q "blue-server"; then
   # 그린 서버 배포
   docker compose -f compose.green.yml up -d green --build
 
+  # 블루 서버가 배포되는 시간 벌어주기. 이거 안해주면 그린서버가 먼저 꺼져서 502오류 뜸
+  sleep 30
+
   # 블루 서버 삭제
   docker compose -f compose.blue.yml down
 
@@ -26,6 +29,9 @@ else
   # 블루 서버 배포
   docker compose -f compose.blue.yml up -d blue --build
 
+  # 블루 서버가 배포되는 시간 벌어주기. 이거 안해주면 그린서버가 먼저 꺼져서 502오류 뜸
+  sleep 30
+
   # 그린 서버 삭제
   docker compose -f compose.green.yml down
 
@@ -35,4 +41,4 @@ else
   NEW_SERVER="blue"
 fi
 
-echo "------- $NEW_SERVER 서버 배포 및 Nginx 전환 완료 --------"
+echo "------- $NEW_SERVER 서버 배포 완료 --------"
