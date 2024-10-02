@@ -13,9 +13,14 @@ if docker ps | grep -q "blue-server"; then
   # 그린 서버 배포
   docker compose -f compose.green.yml up -d green --build
 
-  # 블루 서버가 배포되는 시간 벌어주기. 이거 안해주면 그린서버가 먼저 꺼져서 502오류 뜸
-  sleep 60
+  # 그린 서버가 준비될 때까지 대기
+  echo "그린 서버가 준비 중입니다. 상태를 확인합니다..."
+  while ! docker ps | grep -q "green-server"; do
+    sleep 2
+    echo "그린 서버 준비 중..."
+  done
 
+  echo "그린 서버가 준비되었습니다. 블루 서버 종료 중..."
   # 블루 서버 삭제
   docker compose -f compose.blue.yml down
 
@@ -29,9 +34,14 @@ else
   # 블루 서버 배포
   docker compose -f compose.blue.yml up -d blue --build
 
-  # 블루 서버가 배포되는 시간 벌어주기. 이거 안해주면 그린서버가 먼저 꺼져서 502오류 뜸
-  sleep 40
+  # 블루 서버가 준비될 때까지 대기
+  echo "블루 서버가 준비 중입니다. 상태를 확인합니다..."
+  while ! docker ps | grep -q "blue-server"; do
+    sleep 2
+    echo "블루 서버 준비 중..."
+  done
 
+  echo "블루 서버가 준비되었습니다. 그린 서버 종료 중..."
   # 그린 서버 삭제
   docker compose -f compose.green.yml down
 
