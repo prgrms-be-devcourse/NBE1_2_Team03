@@ -3,7 +3,7 @@ name: CI Pipeline
 on:
   push:
     branches:
-      [develop, main]
+      [develop, main, 25-ci-파이프라인-구축]
   pull_request:
     branches:
       [develop, main]
@@ -33,6 +33,21 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+
+
+      - name: Gradle 캐싱
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 빌드 권한 부여
+        run: chmod +x ./gradlew
+        shell: bash
 
       - name: 빌드 및 테스트
         run: ./gradlew clean build
