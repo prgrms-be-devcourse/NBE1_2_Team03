@@ -21,6 +21,9 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: 기존 application.yml 파일 삭제
+        run: rm -f ./src/main/resources/application.yml
+
       - name: application.yml 파일 만들기(임시 데이터베이스 정보)
         run: echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
 
