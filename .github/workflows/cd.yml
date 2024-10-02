@@ -3,7 +3,7 @@ name: CI Pipeline
 on:
   push:
     branches:
-      [ main ]
+      [ main, feature/29-cd-파이프라인-구축 ]
 
 jobs:
   Continuous-Deployment:
@@ -74,6 +74,18 @@ jobs:
 
       - name: ECR에 Docker 이미지 Push
         run: docker push 211125297893.dkr.ecr.ap-northeast-2.amazonaws.com/sscanner-backend:latest
+
+      - name: .env 파일 작성
+        run: |
+          echo "DB_HOST=${{ secrets.HOME_URL }}" >> docker-compose/.env
+          echo "DB_USERNAME=${{ secrets.HOME_USERNAME }}" >> docker-compose/.env
+          echo "DB_PASSWORD=${{ secrets.HOME_PASSWORD }}" >> docker-compose/.env
+          echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> docker-compose/.env
+          echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> docker-compose/.env
+          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> docker-compose/.env
+          echo "REDIS_PORT=6379" >> docker-compose/.env
+          echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> docker-compose/.env
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> docker-compose/.env
 
       - name: 압축하기
         run: tar -czvf $GITHUB_SHA.tar.gz appspec.yml scripts docker-compose
