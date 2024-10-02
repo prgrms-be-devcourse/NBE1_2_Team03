@@ -14,7 +14,7 @@ if docker ps | grep -q "blue-server"; then
   docker compose -f compose.green.yml up -d green --build
 
   # 블루 서버가 배포되는 시간 벌어주기. 이거 안해주면 그린서버가 먼저 꺼져서 502오류 뜸
-  sleep 30
+  sleep 60
 
   # 블루 서버 삭제
   docker compose -f compose.blue.yml down
@@ -30,7 +30,7 @@ else
   docker compose -f compose.blue.yml up -d blue --build
 
   # 블루 서버가 배포되는 시간 벌어주기. 이거 안해주면 그린서버가 먼저 꺼져서 502오류 뜸
-  sleep 30
+  sleep 60
 
   # 그린 서버 삭제
   docker compose -f compose.green.yml down
