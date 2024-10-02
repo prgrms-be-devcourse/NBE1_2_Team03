@@ -11,6 +11,15 @@ on:
 jobs:
   Continuous-Integration:
     runs-on: ubuntu-latest
+    env:
+      # 임시 데이터베이스 환경변수(추후 RDS로 전환할 예정)
+      HOME_URL: ${{ secrets.HOME_URL }}
+      HOME_USERNAME: ${{ secrets.HOME_USERNAME }}
+      HOME_PASSWORD: ${{ secrets.HOME_PASSWORD }}
+      # AWS 환경변수
+      AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ap-northeast-2
     steps:
       - name: Github Repository 파일 불러오기
         uses: actions/checkout@v4
@@ -20,12 +29,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-
-      - name: 기존 application.yml 파일 삭제
-        run: rm -f ./src/main/resources/application.yml
-
-      - name: application.yml 파일 만들기(임시 데이터베이스 정보)
-        run: echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
 
       - name: 빌드 및 테스트
         run: ./gradlew clean build
