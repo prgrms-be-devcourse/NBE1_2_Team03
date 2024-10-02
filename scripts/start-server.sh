@@ -13,12 +13,6 @@ if docker ps | grep -q "blue-server"; then
   # 그린 서버 배포
   docker compose -f compose.green.yml up -d green --build
 
-  # Nginx 설정을 그린 서버로 전환
-  sudo sed -i 's/127.0.0.1:8081/127.0.0.1:8082/' $NGINX_CONF
-
-  # Nginx 리로드
-  sudo nginx -s reload
-
   # 블루 서버 삭제
   docker compose -f compose.blue.yml down
 
@@ -32,15 +26,8 @@ else
   # 블루 서버 배포
   docker compose -f compose.blue.yml up -d blue --build
 
-  # Nginx 설정을 블루 서버로 전환
-  sudo sed -i 's/127.0.0.1:8082/127.0.0.1:8081/' $NGINX_CONF
-
-  # Nginx 리로드
-  sudo nginx -s reload
-
   # 그린 서버 삭제
-  # 블루 서버 삭제
-    docker compose -f compose.green.yml down
+  docker compose -f compose.green.yml down
 
   # 사용하지 않는 이미지 삭제
   docker image prune -af
