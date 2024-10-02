@@ -49,6 +49,13 @@ public enum ExceptionCode {
     DUPLICATED_PHONE(409, "이미 가입된 핸드폰 번호입니다. "),
     PASSWORD_NOT_MATCH(400, "비밀번호와 비밀번호 확인이 일치하지 않습니다."),
     USER_NOT_FOUND(400,"해당 유저가 존재하지 않습니다."),
+    NOT_EXIST_REFRESH_TOKEN(400, "리프레시 토큰이 존재하지 않습니다."),
+    EXPIRED_REFRESH_TOKEN(400, "리프레시 토큰이 만료되었습니다."),
+    INVALID_REFRESH_TOKEN(400, "유효하지 않은 리프레시 토큰입니다."),
+    EXPIRED_ACCESS_TOKEN(401, "엑세스 토큰이 만료되었습니다."),
+    INVALID_ACCESS_TOKEN(401, "유효하지 않은 액세스 토큰입니다.");
+    ;
+    USER_NOT_FOUND(400,"해당 유저가 존재하지 않습니다."),
     NOT_EXIST_TRASHCAN_IMG_ID(400, "해당하는 쓰레기통 이미지가 존재하지 않습니다.");
 
     private final int code;
