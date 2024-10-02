@@ -23,7 +23,7 @@ public record BoardResponseDTO(
     TrashcanStatus updatedTrashcanStatus,
     List<BoardImgResponseDTO> boardImgs
 ) {
-    public static BoardResponseDTO from(Board board, List<BoardImg> boardImgs) {
+    public static BoardResponseDTO of(Board board, List<BoardImg> boardImgs) {
         return new BoardResponseDTO(
                 board.getId(),
                 board.getBoardCategory(),
@@ -36,7 +36,7 @@ public record BoardResponseDTO(
                 board.getTrashCategory(),
                 board.getUpdatedTrashcanStatus(),
                 boardImgs.stream()
-                        .map((BoardImg boardImg) -> BoardImgResponseDTO.of(boardImg))
+                        .map((BoardImg boardImg) -> BoardImgResponseDTO.from(boardImg))
                         .collect(Collectors.toList())
         );
     }

@@ -11,7 +11,7 @@ public record BoardListResponseDTO(
         String detailedAddress,
         TrashCategory trashCategory
 ) {
-    public static BoardListResponseDTO of(Board board) {
+    public static BoardListResponseDTO from(Board board) {
         return new BoardListResponseDTO(
                 board.getId(),
                 board.getBoardCategory(),

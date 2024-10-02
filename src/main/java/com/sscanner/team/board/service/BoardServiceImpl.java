@@ -53,7 +53,7 @@ public class BoardServiceImpl implements BoardService{
 
         List<BoardImg> boardImgs = boardImgService.saveBoardImg(savedAddBoard.getId(), files);
 
-        return BoardResponseDTO.from(savedAddBoard, boardImgs);
+        return BoardResponseDTO.of(savedAddBoard, boardImgs);
     }
 
     /**
@@ -93,7 +93,7 @@ public class BoardServiceImpl implements BoardService{
             boardImgs = boardImgService.updateBoardImgs(board.getId(), files);
         }
 
-        return BoardResponseDTO.from(board, boardImgs);
+        return BoardResponseDTO.of(board, boardImgs);
     }
 
     /**
@@ -111,7 +111,7 @@ public class BoardServiceImpl implements BoardService{
 
         Page<Board> boards = boardRepository.findAllByBoardCategoryAndTrashCategory(boardCategory, trashCategory, pageRequest);
 
-        return boards.map(board -> BoardListResponseDTO.of(board));
+        return boards.map(board -> BoardListResponseDTO.from(board));
     }
 
     /**
@@ -125,7 +125,7 @@ public class BoardServiceImpl implements BoardService{
 
         List<BoardImg> boardImgs = boardImgService.getBoardImgs(boardId);
 
-        return BoardResponseDTO.from(board, boardImgs);
+        return BoardResponseDTO.of(board, boardImgs);
     }
 
     @Override
