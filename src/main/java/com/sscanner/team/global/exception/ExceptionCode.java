@@ -30,6 +30,7 @@ public enum ExceptionCode {
 
     //Unsupported Media Type
     BAD_FILE_EXTENSION(415, "적절하지 않은 파일 확장자입니다."),
+    INVALID_FILE_NAME(415, "파일 이름이 잘못되었습니다."),
 
     //BAD REQUEST
     NOT_EXIST_TRASHCAN_ID(400, "해당하는 쓰레기통이 존재하지 않습니다."),
@@ -47,7 +48,8 @@ public enum ExceptionCode {
     DUPLICATED_NICKNAME(409, "이미 가입된 닉네임입니다. "),
     DUPLICATED_PHONE(409, "이미 가입된 핸드폰 번호입니다. "),
     PASSWORD_NOT_MATCH(400, "비밀번호와 비밀번호 확인이 일치하지 않습니다."),
-    USER_NOT_FOUND(400,"해당 유저가 존재하지 않습니다.");
+    USER_NOT_FOUND(400,"해당 유저가 존재하지 않습니다."),
+    NOT_EXIST_TRASHCAN_IMG_ID(400, "해당하는 쓰레기통 이미지가 존재하지 않습니다.");
 
     private final int code;
     private final String message;

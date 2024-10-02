@@ -2,13 +2,16 @@ package com.sscanner.team.trashcan.service;
 
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.trashcan.entity.Trashcan;
+import com.sscanner.team.trashcan.entity.TrashcanImg;
 import com.sscanner.team.trashcan.repository.TrashcanRepository;
 import com.sscanner.team.trashcan.requestDto.RegisterTrashcanRequestDto;
 import com.sscanner.team.trashcan.requestDto.UpdateTrashcanRequestDto;
 import com.sscanner.team.trashcan.responseDto.TrashcanResponseDto;
+import com.sscanner.team.trashcan.responseDto.TrashcanWithImgResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.sscanner.team.global.exception.ExceptionCode.NOT_EXIST_TRASHCAN_ID;
 
@@ -17,24 +20,32 @@ import static com.sscanner.team.global.exception.ExceptionCode.NOT_EXIST_TRASHCA
 public class TrashcanServiceImpl implements TrashcanService {
 
     private final TrashcanRepository trashcanRepository;
+    private final TrashcanImgService trashcanImgService;
+
 
     @Override
     @Transactional
-    public TrashcanResponseDto registerTrashcan(RegisterTrashcanRequestDto requestDto) {
+    public TrashcanWithImgResponseDto registerTrashcan(RegisterTrashcanRequestDto requestDto, MultipartFile file) {
 
         Trashcan trashcan = requestDto.toEntity();
-
         trashcanRepository.save(trashcan);
 
-        return TrashcanResponseDto.from(trashcan);
+        String imgUrl = trashcanImgService.uploadTrashcanImg(file);
+
+        TrashcanImg trashcanImg = trashcanImgService.saveTrashcanImg(trashcan.getId(), imgUrl);
+
+        return TrashcanWithImgResponseDto.of(trashcan, trashcanImg);
     }
 
+
+
     @Override
-    public TrashcanResponseDto getTrashcanInfo(Long trashcanId) {
+    public TrashcanWithImgResponseDto getTrashcanInfo(Long trashcanId) {
 
         Trashcan trashcan = getTrashcanById(trashcanId);
+        TrashcanImg trashcanImg = trashcanImgService.getTrashcanImg(trashcanId);
 
-        return TrashcanResponseDto.from(trashcan);
+        return TrashcanWithImgResponseDto.of(trashcan, trashcanImg);
     }
 
     private Trashcan getTrashcanById(Long trashcanId) {
