@@ -30,7 +30,7 @@ else
   docker compose -f compose.blue.yml up -d blue --build
 
   # 블루 서버가 배포되는 시간 벌어주기. 이거 안해주면 그린서버가 먼저 꺼져서 502오류 뜸
-  sleep 60
+  sleep 40
 
   # 그린 서버 삭제
   docker compose -f compose.green.yml down
