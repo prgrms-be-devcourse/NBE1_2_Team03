@@ -1,6 +1,7 @@
 package com.sscanner.team.board.entity;
 
 import com.sscanner.team.User;
+import com.sscanner.team.board.requestdto.BoardUpdateRequestDTO;
 import com.sscanner.team.board.type.BoardCategory;
 import com.sscanner.team.global.common.BaseEntity;
 import com.sscanner.team.trashcan.type.TrashCategory;
@@ -13,8 +14,6 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -66,9 +65,6 @@ public class Board extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TrashcanStatus updatedTrashcanStatus;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
-    private List<BoardImg> boardImgs = new ArrayList<>();
-
     @Builder
     public Board(User user,
                  BoardCategory boardCategory,
@@ -93,9 +89,14 @@ public class Board extends BaseEntity {
         this.updatedTrashcanStatus = updatedTrashcanStatus;
     }
 
-    public void addBoardImgs(List<BoardImg> boardImgs) {
-        for(BoardImg boardImg : boardImgs) {
-            this.boardImgs.add(boardImg);
-        }
+    public void updateBoardInfo(BoardUpdateRequestDTO boardUpdateRequestDTO) {
+        this.significant = boardUpdateRequestDTO.significant();
+        this.trashcanId = boardUpdateRequestDTO.trashcanId();
+        this.latitude = boardUpdateRequestDTO.latitude();
+        this.longitude = boardUpdateRequestDTO.longitude();
+        this.roadNameAddress = boardUpdateRequestDTO.roadNameAddress();
+        this.detailedAddress = boardUpdateRequestDTO.detailedAddress();
+        this.trashCategory = boardUpdateRequestDTO.trashCategory();
+        this.updatedTrashcanStatus = boardUpdateRequestDTO.updatedTrashcanStatus();
     }
 }
