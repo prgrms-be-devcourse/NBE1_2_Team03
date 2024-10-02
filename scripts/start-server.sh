@@ -15,9 +15,9 @@ if docker ps | grep -q "blue-server"; then
 
   # 그린 서버가 준비될 때까지 대기
   echo "그린 서버가 준비 중입니다. 상태를 확인합니다..."
-  while ! docker ps | grep -q "green-server"; do
-    sleep 2
-    echo "그린 서버 준비 중..."
+  while ! curl -sf http://localhost:8082/health; do
+      sleep 2
+      echo "그린 서버 준비 중..."
   done
 
   echo "그린 서버가 준비되었습니다. 블루 서버 종료 중..."
@@ -36,9 +36,9 @@ else
 
   # 블루 서버가 준비될 때까지 대기
   echo "블루 서버가 준비 중입니다. 상태를 확인합니다..."
-  while ! docker ps | grep -q "blue-server"; do
-    sleep 2
-    echo "블루 서버 준비 중..."
+  while ! curl -sf http://localhost:8081/health; do
+      sleep 2
+      echo "블루 서버 준비 중..."
   done
 
   echo "블루 서버가 준비되었습니다. 그린 서버 종료 중..."
