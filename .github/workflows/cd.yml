@@ -53,10 +53,6 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
-
-      - name: Redis Port 환경 변수 설정
-        run: echo "REDIS_PORT=6379" >> $GITHUB_ENV
-
       - name: 빌드 및 테스트
         run: ./gradlew clean build
       - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
