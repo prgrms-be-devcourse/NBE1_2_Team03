@@ -22,7 +22,7 @@ jobs:
       AWS_REGION: ap-northeast-2
       # Redis 환경변수
       REDIS_HOST: ${{ secrets.REDIS_HOST }}
-      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      REDIS_PORT: 6379
 
     steps:
       - name: Github Repository 파일 불러오기
