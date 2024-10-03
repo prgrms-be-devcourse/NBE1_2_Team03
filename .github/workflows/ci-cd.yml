@@ -3,7 +3,7 @@ name: CI-CD Pipeline
 on:
   push:
     branches:
-      [ main, feature/29-cd-파이프라인-구축 ]
+      [ main ]
 
 jobs:
   CI-CD:
