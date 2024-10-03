@@ -20,8 +20,10 @@ if docker ps | grep -q "blue-server"; then
       echo "그린 서버 준비 중..."
   done
 
-
+  # 그린 서버가 준비된 후에도 약간의 추가 대기 시간 추가
   echo "그린 서버가 준비되었습니다. 블루 서버 종료 중..."
+  sleep 5  # 추가 대기 시간
+
   # 블루 서버 삭제
   docker compose -f compose.blue.yml down
 
@@ -42,8 +44,11 @@ else
       echo "블루 서버 준비 중..."
   done
 
+  # 블루 서버가 준비된 후에도 약간의 추가 대기 시간 추가
   echo "블루 서버가 준비되었습니다. 그린 서버 종료 중..."
-  # 그린 서버 삭제
+  sleep 5  # 추가 대기 시간
+
+  # 그린 서버 종료
   docker compose -f compose.green.yml down
 
   # 사용하지 않는 이미지 삭제
@@ -52,5 +57,7 @@ else
   NEW_SERVER="blue"
 fi
 
-echo "------- $NEW_SERVER 서버 배포 완료 --------"
+# Nginx 재시작(reload)으로 새로운 서버로 트래픽을 보내도록 보장
 sudo service nginx reload
+
+echo "------- $NEW_SERVER 서버 배포 완료 --------"
