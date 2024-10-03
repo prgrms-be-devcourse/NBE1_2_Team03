@@ -3,7 +3,7 @@ name: CI-CD Pipeline
 on:
   push:
     branches:
-      [ main, feature/29-cd-파이프라인-구축 ]
+      [ main ]
 
 jobs:
   CI-CD:
@@ -23,6 +23,8 @@ jobs:
       # Bucker 환경변수
       BUCKET_NAME: ${{ secrets.BUCKET_NAME}}
       BASE_URL: ${{ secrets.BASE_URL }}
+      # jwt secret 환경변수
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     steps:
       - name: Github Repository 파일 불러오기
@@ -87,6 +89,7 @@ jobs:
           echo "REDIS_PORT=6379" >> docker-compose/.env
           echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> docker-compose/.env
           echo "BASE_URL=${{ secrets.BASE_URL }}" >> docker-compose/.env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> docker-compose/.env
 
       - name: 압축하기
         run: tar -czvf $GITHUB_SHA.tar.gz appspec.yml scripts docker-compose
