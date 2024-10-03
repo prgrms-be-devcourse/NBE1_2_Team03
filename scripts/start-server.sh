@@ -19,7 +19,6 @@ if docker ps | grep -q "blue-server"; then
       sleep 2
       echo "그린 서버 준비 중..."
   done
-  sleep 5  # 추가 대기 시간
 
 
   echo "그린 서버가 준비되었습니다. 블루 서버 종료 중..."
@@ -42,7 +41,6 @@ else
       sleep 2
       echo "블루 서버 준비 중..."
   done
-  sleep 5  # 추가 대기 시간: 응답은 왔지만 아직 서버가 제대로 준비 안됐을 가능성
 
   echo "블루 서버가 준비되었습니다. 그린 서버 종료 중..."
   # 그린 서버 삭제
@@ -55,3 +53,4 @@ else
 fi
 
 echo "------- $NEW_SERVER 서버 배포 완료 --------"
+sudo service nginx reload
