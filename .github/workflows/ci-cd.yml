@@ -1,0 +1,105 @@
+name: CI-CD Pipeline
+
+on:
+  push:
+    branches:
+      [ main ]
+
+jobs:
+  CI-CD:
+    runs-on: ubuntu-latest
+    env:
+      # 임시 데이터베이스 환경변수(추후 RDS로 전환할 예정)
+      HOME_URL: ${{ secrets.HOME_URL }}
+      HOME_USERNAME: ${{ secrets.HOME_USERNAME }}
+      HOME_PASSWORD: ${{ secrets.HOME_PASSWORD }}
+      # AWS 환경변수
+      AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ap-northeast-2
+      # Redis 환경변수
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PORT: 6379
+      # Bucker 환경변수
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME}}
+      BASE_URL: ${{ secrets.BASE_URL }}
+      # jwt secret 환경변수
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+    steps:
+      - name: Github Repository 파일 불러오기
+        uses: actions/checkout@v4
+
+      - name: JDK 17 버전 설치
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Gradle 캐싱
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 빌드 권한 부여
+        run: chmod +x ./gradlew
+        shell: bash
+
+      - name: 빌드 및 테스트
+        run: ./gradlew clean build
+      - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-northeast-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: ECR에 로그인하기
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Docker 이미지 생성
+        run: docker build -t sscanner-backend .
+
+      - name: Docker 이미지에 tag 붙이기
+        run: docker tag sscanner-backend:latest 211125297893.dkr.ecr.ap-northeast-2.amazonaws.com/sscanner-backend:latest
+
+      - name: ECR에 Docker 이미지 Push
+        run: docker push 211125297893.dkr.ecr.ap-northeast-2.amazonaws.com/sscanner-backend:latest
+
+      - name: .env 파일 작성
+        run: |
+          echo "HOME_URL=${{ secrets.HOME_URL }}" >> docker-compose/.env
+          echo "HOME_USERNAME=${{ secrets.HOME_USERNAME }}" >> docker-compose/.env
+          echo "HOME_PASSWORD=${{ secrets.HOME_PASSWORD }}" >> docker-compose/.env
+          echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> docker-compose/.env
+          echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> docker-compose/.env
+          echo "AWS_REGION=ap-northeast-2" >> docker-compose/.env
+          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> docker-compose/.env
+          echo "REDIS_PORT=6379" >> docker-compose/.env
+          echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> docker-compose/.env
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> docker-compose/.env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> docker-compose/.env
+
+      - name: 압축하기
+        run: tar -czvf $GITHUB_SHA.tar.gz appspec.yml scripts docker-compose
+
+      - name: S3에 프로젝트 폴더 업데이트 하기
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.tar.gz s3://sscanner-bucket-codedeployfiles/$GITHUB_SHA.tar.gz
+
+      - name: CodeDeploy를 활용해 EC2에 프로젝트 코드 배포
+        run: aws deploy create-deployment
+          --application-name sscanner-code_deploy
+          --deployment-group-name Production
+          --deployment-config-name CodeDeployDefault.AllAtOnce
+          --s3-location bucket=sscanner-bucket-codedeployfiles,bundleType=tgz,key=$GITHUB_SHA.tar.gz
