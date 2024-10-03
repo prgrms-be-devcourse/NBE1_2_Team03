@@ -20,9 +20,10 @@ if docker ps | grep -q "blue-server"; then
       echo "그린 서버 준비 중..."
   done
 
+  sudo service nginx reload
   # 그린 서버가 준비된 후에도 약간의 추가 대기 시간 추가
-  echo "그린 서버가 준비되었습니다. 블루 서버 종료 중..."
-  sleep 5  # 추가 대기 시간
+#  echo "그린 서버가 준비되었습니다. 블루 서버 종료 중..."
+#  sleep 5  # 추가 대기 시간
 
   # 블루 서버 삭제
   docker compose -f compose.blue.yml down
@@ -44,9 +45,10 @@ else
       echo "블루 서버 준비 중..."
   done
 
+  sudo service nginx reload
   # 블루 서버가 준비된 후에도 약간의 추가 대기 시간 추가
-  echo "블루 서버가 준비되었습니다. 그린 서버 종료 중..."
-  sleep 5  # 추가 대기 시간
+#  echo "블루 서버가 준비되었습니다. 그린 서버 종료 중..."
+#  sleep 5  # 추가 대기 시간
 
   # 그린 서버 종료
   docker compose -f compose.green.yml down
