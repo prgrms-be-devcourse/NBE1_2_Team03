@@ -1,6 +1,7 @@
 package com.sscanner.team.user.scheduler;
 
 import com.sscanner.team.user.repository.RefreshRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ public class RefreshTokenScheduler {
 
     // 자정마다 만료된 리프레시 토큰 삭제
     @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
     public void deleteExpiredTokens() {
         Date now = new Date();
         refreshRepository.deleteExpiredTokens(now);

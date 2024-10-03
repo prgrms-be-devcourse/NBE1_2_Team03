@@ -13,10 +13,8 @@ public interface RefreshRepository extends JpaRepository<Refresh, Long> {
 
     Boolean existsByRefresh(String refresh);
 
-    @Transactional
     void deleteByRefresh(String refresh);
 
-    @Transactional
     @Modifying
     @Query("DELETE FROM Refresh r WHERE r.expiration < :currentDate")
     void deleteExpiredTokens(@Param("currentDate") Date currentDate);
