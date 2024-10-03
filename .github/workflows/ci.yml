@@ -26,6 +26,8 @@ jobs:
       # Bucker 환경변수
       BUCKET_NAME: ${{ secrets.BUCKET_NAME}}
       BASE_URL: ${{ secrets.BASE_URL }}
+      # jwt secret 환경변수
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     steps:
       - name: Github Repository 파일 불러오기
