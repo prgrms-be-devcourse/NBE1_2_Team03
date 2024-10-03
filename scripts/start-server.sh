@@ -58,6 +58,6 @@ else
 fi
 
 # Nginx 재시작(reload)으로 새로운 서버로 트래픽을 보내도록 보장
-# sudo service nginx reload
+sudo service nginx reload
 
 echo "------- $NEW_SERVER 서버 배포 완료 --------"
