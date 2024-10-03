@@ -6,11 +6,17 @@ import com.sscanner.team.board.entity.BoardImg;
 import com.sscanner.team.board.repository.BoardRepository;
 import com.sscanner.team.board.requestdto.BoardCreateRequestDTO;
 import com.sscanner.team.board.requestdto.BoardUpdateRequestDTO;
+import com.sscanner.team.board.responsedto.BoardListResponseDTO;
 import com.sscanner.team.board.responsedto.BoardResponseDTO;
+import com.sscanner.team.board.type.BoardCategory;
 import com.sscanner.team.global.exception.BadRequestException;
+import com.sscanner.team.trashcan.type.TrashCategory;
 import com.sscanner.team.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,7 +53,7 @@ public class BoardServiceImpl implements BoardService{
 
         List<BoardImg> boardImgs = boardImgService.saveBoardImg(savedAddBoard.getId(), files);
 
-        return BoardResponseDTO.from(savedAddBoard, boardImgs);
+        return BoardResponseDTO.of(savedAddBoard, boardImgs);
     }
 
     /**
@@ -87,7 +93,39 @@ public class BoardServiceImpl implements BoardService{
             boardImgs = boardImgService.updateBoardImgs(board.getId(), files);
         }
 
-        return BoardResponseDTO.from(board, boardImgs);
+        return BoardResponseDTO.of(board, boardImgs);
+    }
+
+    /**
+     * 게시글 목록 조회
+     * @param boardCategory - 게시글 유형
+     * @param trashCategory - 쓰레기통 종류
+     * @param page - 페이지
+     * @param size - 한 페이지에 데이터 수
+     * @return Page<BoardListResponseDTO>
+     */
+    @Override
+    public Page<BoardListResponseDTO> getBoardList(BoardCategory boardCategory, TrashCategory trashCategory,
+                                                Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.DESC, "updatedAt");
+
+        Page<Board> boards = boardRepository.findAllByBoardCategoryAndTrashCategory(boardCategory, trashCategory, pageRequest);
+
+        return boards.map(board -> BoardListResponseDTO.from(board));
+    }
+
+    /**
+     * 게시글 상세 조회
+     * @param boardId - 게시글 id
+     * @return BoardResponseDTO
+     */
+    @Override
+    public BoardResponseDTO getBoardDetailed(Long boardId) {
+        Board board = getBoard(boardId);
+
+        List<BoardImg> boardImgs = boardImgService.getBoardImgs(boardId);
+
+        return BoardResponseDTO.of(board, boardImgs);
     }
 
     @Override
