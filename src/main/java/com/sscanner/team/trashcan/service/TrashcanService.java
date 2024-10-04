@@ -7,6 +7,9 @@ import com.sscanner.team.trashcan.responseDto.TrashcanWithImgResponseDto;
 import jakarta.transaction.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 public interface TrashcanService {
 
 
@@ -22,4 +25,5 @@ public interface TrashcanService {
     TrashcanResponseDto updateTrashcanInfo(Long trashcanId, UpdateTrashcanRequestDto requestDto);
 
 
+    List<TrashcanResponseDto> getTrashcanByCoordinate(BigDecimal latitude, BigDecimal longitude);
 }
