@@ -61,7 +61,7 @@ public class ReissueService {
         String authority = jwtUtil.getAuthority(refresh);
 
         // 새 access 토큰 발급
-        String newAccess = jwtUtil.createJwt("access", email, authority, 600000L);
+        String newAccess = jwtUtil.createJwt("access", email, authority, 6000L);
         String newRefresh = jwtUtil.createJwt("refresh", email, authority, 86400000L);
 
         // 기존 Refresh 토큰 삭제 후 새 Refresh 토큰 저장

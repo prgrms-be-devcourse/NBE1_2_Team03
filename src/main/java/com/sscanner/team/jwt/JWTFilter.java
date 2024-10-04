@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
@@ -37,14 +38,22 @@ public class JWTFilter extends OncePerRequestFilter {
         try {
             jwtUtil.isExpired(accessToken);
         } catch (ExpiredJwtException e) {
-            throw new BadRequestException(ExceptionCode.EXPIRED_ACCESS_TOKEN);
+            PrintWriter writer = response.getWriter();
+            writer.print("만료된 access 토큰");
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
 
         // access 토큰인지 확인
         String category = jwtUtil.getCategory(accessToken);
 
         if (!category.equals("access")) {
-            throw new BadRequestException(ExceptionCode.INVALID_ACCESS_TOKEN);
+            PrintWriter writer = response.getWriter();
+            writer.print("유효하지 않은 access 토큰");
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
 
         // access 토큰이면 email, authority 가져옴

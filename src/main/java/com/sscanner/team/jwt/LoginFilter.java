@@ -17,6 +17,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -51,7 +52,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String authority = auth.getAuthority();
 
         // 토큰 생성 및 저장
-        String access = jwtUtil.createJwt("access", email, authority, 600000L);
+        String access = jwtUtil.createJwt("access", email, authority, 6000L);
         String refresh = jwtUtil.createJwt("refresh", email, authority, 86400000L);
 
         addRefreshEntity(email, refresh, 86400000L);
@@ -63,7 +64,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-        throw new BadRequestException(ExceptionCode.EXPIRED_ACCESS_TOKEN);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     // 리프레시 토큰 저장소에 저장
