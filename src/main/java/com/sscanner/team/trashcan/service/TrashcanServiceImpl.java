@@ -71,8 +71,12 @@ public class TrashcanServiceImpl implements TrashcanService {
 
     @Transactional
     public void deleteTrashcanInfo(Long trashcanId) {
-        Trashcan trashcan = getTrashcanById(trashcanId);
-        trashcanRepository.delete(trashcan);
+
+        try {
+            trashcanRepository.deleteById(trashcanId);
+        } catch (IllegalArgumentException e){
+            throw new BadRequestException(NOT_EXIST_TRASHCAN_ID);
+        }
     }
 
     @Transactional
