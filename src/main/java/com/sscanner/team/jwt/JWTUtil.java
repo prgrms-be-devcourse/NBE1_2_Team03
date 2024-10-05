@@ -37,13 +37,12 @@ public class JWTUtil {
     public String getAuthority(String token) {
         return parseToken(token).get("authority", String.class);    }
 
-//    public void isExpired(String token) {
-//        if (parseToken(token).getExpiration().before(new Date())) {
-//            throw new ExpiredJwtException(null, null, "토큰 만료됨");
-//        }
-//    }
-public Boolean isExpired(String token) {
-    return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+
+public void isExpired(String token) {
+    Claims claims = parseToken(token);
+    if (claims.getExpiration().before(new Date())) {
+        throw new ExpiredJwtException(null, claims, "토큰 만료됨");
+    }
 }
 
     public String createJwt(String category ,String email, String authority, Long expiredMs) {
