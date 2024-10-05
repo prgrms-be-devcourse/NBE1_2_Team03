@@ -25,43 +25,17 @@ public class ReissueService {
     private final RefreshRepository refreshRepository;
 
     public ApiResponse<RefreshResponseDto> reissueToken(HttpServletRequest request, HttpServletResponse response) {
-        String refresh = null;
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("refresh")) {
-                refresh = cookie.getValue();
-            }
-        }
+        String refresh = getRefreshTokenFromCookies(request);
 
-        // 리프레시 토큰 존재 체크
-        if (refresh == null) {
-            throw new BadRequestException(ExceptionCode.NOT_EXIST_REFRESH_TOKEN);
-        }
-
-        // 리프레시토큰 만료 체크
-        try {
-            jwtUtil.isExpired(refresh);
-        } catch (ExpiredJwtException e) {
-            throw new BadRequestException(ExceptionCode.EXPIRED_REFRESH_TOKEN);
-        }
-
-        // 리프레시 토큰이 맞는지 체크
-        String category = jwtUtil.getCategory(refresh);
-        if (!category.equals("refresh")) {
-            throw new BadRequestException(ExceptionCode.INVALID_REFRESH_TOKEN);
-        }
-
-        // DB에 해당 리프레시 토큰 존재 체크
-        Boolean isExist = refreshRepository.existsByRefresh(refresh);
-        if (!isExist) {
-            throw new BadRequestException(ExceptionCode.INVALID_REFRESH_TOKEN);
-        }
+        checkRefreshTokenExist(refresh);
+        validateRefreshCategory(refresh);
+        validateRefreshToken(refresh);
 
         String email = jwtUtil.getEmail(refresh);
         String authority = jwtUtil.getAuthority(refresh);
 
         // 새 access 토큰 발급
-        String newAccess = jwtUtil.createJwt("access", email, authority, 6000L);
+        String newAccess = jwtUtil.createJwt("access", email, authority, 20000L);
         String newRefresh = jwtUtil.createJwt("refresh", email, authority, 86400000L);
 
         // 기존 Refresh 토큰 삭제 후 새 Refresh 토큰 저장
@@ -73,6 +47,37 @@ public class ReissueService {
 
         RefreshResponseDto responseDto = RefreshResponseDto.from(newAccess, newRefresh);
         return ApiResponse.ok(200, responseDto, "토큰 재발급 성공");
+    }
+
+    private  String getRefreshTokenFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if ("refresh".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        throw new BadRequestException(ExceptionCode.NOT_EXIST_REFRESH_TOKEN);
+    }
+
+    private void validateRefreshToken(String refresh) {
+        try {
+            jwtUtil.isExpired(refresh);
+        } catch (ExpiredJwtException e) {
+            throw new BadRequestException(ExceptionCode.EXPIRED_REFRESH_TOKEN);
+        }
+    }
+
+    private void validateRefreshCategory(String refresh) {
+        String category = jwtUtil.getCategory(refresh);
+        if (!"refresh".equals(category)) {
+            throw new BadRequestException(ExceptionCode.INVALID_REFRESH_TOKEN);
+        }
+    }
+
+    private void checkRefreshTokenExist(String refresh) {
+        if (!refreshRepository.existsByRefresh(refresh)) {
+            throw new BadRequestException(ExceptionCode.INVALID_REFRESH_TOKEN);
+        }
     }
 
     // 리프레시 토큰 추가 후 저장

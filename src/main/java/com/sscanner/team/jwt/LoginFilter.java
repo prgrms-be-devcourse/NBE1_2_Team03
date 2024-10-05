@@ -52,7 +52,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String authority = auth.getAuthority();
 
         // 토큰 생성 및 저장
-        String access = jwtUtil.createJwt("access", email, authority, 6000L);
+        String access = jwtUtil.createJwt("access", email, authority, 20000L);
         String refresh = jwtUtil.createJwt("refresh", email, authority, 86400000L);
 
         addRefreshEntity(email, refresh, 86400000L);

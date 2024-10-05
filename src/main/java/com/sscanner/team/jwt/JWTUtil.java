@@ -1,5 +1,7 @@
 package com.sscanner.team.jwt;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,28 +20,37 @@ public class JWTUtil {
         this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
+    private Claims parseToken(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
     public String getCategory(String token){
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
+        return parseToken(token).get("category", String.class);
     }
 
     public String getEmail(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
-    }
+        return parseToken(token).get("email", String.class);    }
 
     public String getAuthority(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("authority", String.class);
-    }
+        return parseToken(token).get("authority", String.class);    }
 
-    public Boolean isExpired(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
-    }
+//    public void isExpired(String token) {
+//        if (parseToken(token).getExpiration().before(new Date())) {
+//            throw new ExpiredJwtException(null, null, "토큰 만료됨");
+//        }
+//    }
+public Boolean isExpired(String token) {
+    return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+}
 
-    public String createJwt(String category ,String email, String Authority, Long expiredMs) {
-
+    public String createJwt(String category ,String email, String authority, Long expiredMs) {
         return Jwts.builder()
                 .claim("category", category)
                 .claim("email", email)
-                .claim("Authority", Authority)
+                .claim("authority", authority)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
