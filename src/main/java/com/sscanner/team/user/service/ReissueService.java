@@ -24,6 +24,10 @@ public class ReissueService {
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
 
+    private static final String REFRESH_TOKEN = "refresh";
+    private static final String ACCESS_TOKEN = "access";
+
+
     public ApiResponse<RefreshResponseDto> reissueToken(HttpServletRequest request, HttpServletResponse response) {
         String refresh = getRefreshTokenFromCookies(request);
 
@@ -35,15 +39,15 @@ public class ReissueService {
         String authority = jwtUtil.getAuthority(refresh);
 
         // 새 access 토큰 발급
-        String newAccess = jwtUtil.createJwt("access", email, authority, 20000L);
-        String newRefresh = jwtUtil.createJwt("refresh", email, authority, 86400000L);
+        String newAccess = jwtUtil.createJwt(ACCESS_TOKEN, email, authority, 20000L);
+        String newRefresh = jwtUtil.createJwt(REFRESH_TOKEN, email, authority, 86400000L);
 
         // 기존 Refresh 토큰 삭제 후 새 Refresh 토큰 저장
         refreshRepository.deleteByRefresh(refresh);
         addRefresh(email, newRefresh, 86400000L);
 
-        response.setHeader("access", newAccess);
-        response.addCookie(createCookie("refresh", newRefresh));
+        response.setHeader(ACCESS_TOKEN, newAccess);
+        response.addCookie(createCookie(REFRESH_TOKEN, newRefresh));
 
         RefreshResponseDto responseDto = RefreshResponseDto.from(newAccess, newRefresh);
         return ApiResponse.ok(200, responseDto, "토큰 재발급 성공");
@@ -52,7 +56,7 @@ public class ReissueService {
     private  String getRefreshTokenFromCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
-            if ("refresh".equals(cookie.getName())) {
+            if (REFRESH_TOKEN.equals(cookie.getName())) {
                 return cookie.getValue();
             }
         }
@@ -69,7 +73,7 @@ public class ReissueService {
 
     private void validateRefreshCategory(String refresh) {
         String category = jwtUtil.getCategory(refresh);
-        if (!"refresh".equals(category)) {
+        if (!REFRESH_TOKEN.equals(category)) {
             throw new BadRequestException(ExceptionCode.INVALID_REFRESH_TOKEN);
         }
     }
