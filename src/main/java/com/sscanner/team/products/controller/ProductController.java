@@ -45,7 +45,7 @@ public class ProductController {
      */
     @GetMapping("/{productId}")
     public ApiResponse<ProductWithImgResponseDto> getProductById(@PathVariable Long productId) {
-        ProductWithImgResponseDto product = productService.getProductById(productId);
+        ProductWithImgResponseDto product = productService.getProductWithImgById(productId);
         return ApiResponse.ok(200, product, "상품 정보 조회 성공");
     }
 

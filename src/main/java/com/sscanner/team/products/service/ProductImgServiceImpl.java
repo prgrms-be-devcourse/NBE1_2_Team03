@@ -9,8 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -20,14 +19,27 @@ public class ProductImgServiceImpl implements ProductImgService {
     private final ImageService imageService;
 
     @Override
-    public List<ProductImg> getAllProductImgs(Long productId) {
+    public List<ProductImg> getProductImgsbyId(Long productId) {
         return productImgRepository.findAllByProductId(productId);
     }
 
     @Override
-    public ProductImg getProductImgById(Long productImgId) {
-        return productImgRepository.findById(productImgId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_PRODUCT_IMG_ID));
+    public Map<Long, List<ProductImg>> getAllProductImgsByIds(List<Long> productIds) {
+        List<ProductImg> productImgs = productImgRepository.findAllByProductIdIn(productIds);
+
+        Map<Long, List<ProductImg>> productImgsMap = new HashMap<>();
+
+        for (ProductImg productImg : productImgs) {
+            Long productId = productImg.getProductId();
+
+            if (!productImgsMap.containsKey(productId)) {
+                productImgsMap.put(productId, new ArrayList<>());
+            }
+
+            productImgsMap.get(productId).add(productImg);
+        }
+
+        return productImgsMap;
     }
 
     @Override
@@ -35,12 +47,16 @@ public class ProductImgServiceImpl implements ProductImgService {
         List<ProductImg> productImgList = new ArrayList<>();
 
         for (MultipartFile file : files) {
-            String imgUrl = imageService.makeImgUrl(file);
-            ProductImg productImg = ProductImg.builder()
-                    .productId(productId)
-                    .productImgUrl(imgUrl)
-                    .build();
-            productImgList.add(productImgRepository.save(productImg));
+            try {
+                String imgUrl = imageService.makeImgUrl(file);
+                ProductImg productImg = ProductImg.builder()
+                        .productId(productId)
+                        .productImgUrl(imgUrl)
+                        .build();
+                productImgList.add(productImgRepository.save(productImg));
+            } catch (Exception e) {
+                throw new BadRequestException(ExceptionCode.FILE_UPLOAD_FAIL);
+            }
         }
 
         return productImgList;
