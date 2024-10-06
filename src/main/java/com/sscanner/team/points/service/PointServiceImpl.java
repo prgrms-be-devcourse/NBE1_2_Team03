@@ -3,12 +3,16 @@ package com.sscanner.team.points.service;
 import com.sscanner.team.points.entity.UserPoint;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
-import com.sscanner.team.points.common.PointManager;
+import com.sscanner.team.points.redis.PointRedisManager;
+import com.sscanner.team.points.repository.PointRepository;
 import com.sscanner.team.points.requestdto.PointRequestDto;
+import com.sscanner.team.points.requestdto.PointUpdateRequestDto;
 import com.sscanner.team.points.responsedto.PointResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 import static com.sscanner.team.points.common.PointConstants.*;
 
@@ -16,7 +20,8 @@ import static com.sscanner.team.points.common.PointConstants.*;
 @RequiredArgsConstructor
 public class PointServiceImpl implements PointService {
 
-    private final PointManager pointManager;
+    private final PointRedisManager pointRedisManager;
+    private final PointRepository pointRepository;
 
     /**
      * 사용자 포인트를 조회합니다.
@@ -25,13 +30,7 @@ public class PointServiceImpl implements PointService {
      */
     @Override
     public PointResponseDto getPoint(String userId) {
-        Integer point = pointManager.getPointFromRedis(userId);
-
-        if (point == null) {
-            UserPoint userPoint = pointManager.findUserPointByUserId(userId);
-            point = userPoint.getPoint();
-            pointManager.updatePointInRedis(userId, point);
-        }
+        Integer point = getOrUpdatePoint(userId);
 
         return PointResponseDto.of(userId, point);
     }
@@ -47,19 +46,59 @@ public class PointServiceImpl implements PointService {
         String userId = pointRequestDto.userId();
         Integer point = pointRequestDto.point();
 
-        Integer dailyPoint = pointManager.getDailyPointFromRedis(userId);
+        // 먼저 Redis에 사용자가 있는지 확인, 없으면 MySQL에서 가져와 Redis에 저장
+        getOrUpdatePoint(userId);
+
+        Integer dailyPoint = pointRedisManager.getDailyPointFromRedis(userId);
         validateDailyLimitPoints(dailyPoint, point);
 
-        pointManager.incrementPointInRedis(userId, point);
-        pointManager.incrementDailyPointInRedis(userId, point);
+        pointRedisManager.incrementPointInRedis(userId, point);
+        pointRedisManager.incrementDailyPointInRedis(userId, point);
 
-        Integer updatedPoint = pointManager.getPointFromRedis(userId);
+        pointRedisManager.flagUserForBackup(userId);
+
+        Integer updatedPoint = pointRedisManager.getPointFromRedis(userId);
         return PointResponseDto.of(userId, updatedPoint);
+    }
+
+    @Transactional
+    @Override
+    public void updateUserPoints(UserPoint userPoint, Integer newPoint) {
+        // PointUpdateRequestDto를 생성하여 DB에 반영
+        PointUpdateRequestDto pointUpdateRequestDto = PointUpdateRequestDto.of(
+                userPoint.getUserPointId(),
+                userPoint.getUser(),
+                newPoint
+        );
+
+        pointRepository.save(pointUpdateRequestDto.toEntity());
+    }
+
+    @Override
+    public UserPoint findUserPointByUserId(String userId) {
+        return pointRepository.findByUserId(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
+    }
+
+    private Integer getOrUpdatePoint(String userId) {
+        Integer point = pointRedisManager.getPointFromRedis(userId);
+
+        if (point == null) {
+            UserPoint userPoint = findUserPointByUserId(userId);
+            point = userPoint.getPoint();
+            pointRedisManager.updatePointInRedis(userId, point);
+        }
+        return point;
     }
 
     private static void validateDailyLimitPoints(Integer dailyPoint, Integer point) {
         if (dailyPoint + point > DAILY_LIMIT) {
             throw new BadRequestException(ExceptionCode.DAILY_POINTS_EXCEEDED);
         }
+    }
+
+    @Override
+    public Set<String> getFlaggedUsersForBackup() {
+        return pointRedisManager.getFlaggedUsers();
     }
 }
