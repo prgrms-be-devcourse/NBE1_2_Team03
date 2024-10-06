@@ -1,4 +1,4 @@
-package com.sscanner.team.points.entity;
+package com.sscanner.team.payment.entity;
 
 import com.sscanner.team.User;
 import com.sscanner.team.global.common.BaseEntity;
