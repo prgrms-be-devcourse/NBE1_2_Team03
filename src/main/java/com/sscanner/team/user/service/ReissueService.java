@@ -43,7 +43,7 @@ public class ReissueService {
         String newRefresh = jwtUtil.createJwt(REFRESH_TOKEN, email, authority, 86400000L);
 
         // 기존 Refresh 토큰 삭제 후 새 Refresh 토큰 저장
-        refreshRepository.deleteByRefresh(refresh);
+        refreshRepository.deleteByRefreshToken(refresh);
         addRefresh(email, newRefresh, 86400000L);
 
         response.setHeader(ACCESS_TOKEN, newAccess);
@@ -79,7 +79,7 @@ public class ReissueService {
     }
 
     private void checkRefreshTokenExist(String refresh) {
-        if (!refreshRepository.existsByRefresh(refresh)) {
+        if (!refreshRepository.existsByRefreshToken(refresh)) {
             throw new BadRequestException(ExceptionCode.INVALID_REFRESH_TOKEN);
         }
     }

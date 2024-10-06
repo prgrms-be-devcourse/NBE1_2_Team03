@@ -11,9 +11,9 @@ import java.util.Date;
 
 public interface RefreshRepository extends JpaRepository<Refresh, Long> {
 
-    Boolean existsByRefresh(String refresh);
+    Boolean existsByRefreshToken(String refreshToken);
 
-    void deleteByRefresh(String refresh);
+    void deleteByRefreshToken(String refreshToken);
 
     @Modifying
     @Query("DELETE FROM Refresh r WHERE r.expiration < :currentDate")

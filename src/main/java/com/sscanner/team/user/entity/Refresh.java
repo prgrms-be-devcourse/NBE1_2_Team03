@@ -21,13 +21,13 @@ public class Refresh extends BaseEntity { // 토큰 저장 테이블
     private Long id;
 
     private String email;
-    private String refresh;
+    private String refreshToken;
     private String expiration;
 
     @Builder
     public Refresh(String email, String refresh, String expiration) {
         this.email = email;
-        this.refresh = refresh;
+        this.refreshToken = refresh;
         this.expiration = expiration;
     }
 
