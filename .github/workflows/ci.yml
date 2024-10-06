@@ -3,7 +3,7 @@ name: CI Pipeline
 on:
   push:
     branches:
-      [ develop, feature/42-ci-파이프라인에-sonarqube-도입 ]
+      [ develop ]
   pull_request:
     branches:
       [ develop ]
