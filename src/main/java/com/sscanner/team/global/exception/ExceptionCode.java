@@ -37,6 +37,7 @@ public enum ExceptionCode {
     NOT_EXIST_FILE(400, "파일이 비어있습니다."),
     NOT_EXIST_BOARD(400, "해당하는 게시글이 존재하지 않습니다."),
     NOT_EXIST_BOARD_IMG(400, "해당하는 게시글의 이미지가 존재하지 않습니다."),
+    NOT_EXIST_COMMENT(400, "해당하는 댓글이 존재하지 않습니다."),
     NOT_FOUND_PRODUCT_ID(400, "해당하는 상품이 존재하지 않습니다."),
     NOT_FOUND_USER_ID(400, "해당 사용자를 찾을 수 없습니다."),
     NOT_FOUND_ITEM_ID(400, "해당 주문에 상품이 존재하지 않습니다."),
