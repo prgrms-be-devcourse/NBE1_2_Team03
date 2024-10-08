@@ -7,6 +7,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 
+@Setter
 @Getter
 @Entity
 @SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE user_id = ?")
