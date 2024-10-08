@@ -50,7 +50,10 @@ public enum ExceptionCode {
     PASSWORD_NOT_MATCH(400, "비밀번호와 비밀번호 확인이 일치하지 않습니다."),
     USER_NOT_FOUND(400,"해당 유저가 존재하지 않습니다."),
     NOT_EXIST_TRASHCAN_IMG_ID(400, "해당하는 쓰레기통 이미지가 존재하지 않습니다."),
-    NOT_FOUND_NEARBY_TRASHCANS(404, "근처에 쓰레기통이 존재하지 않습니다.");
+    NOT_FOUND_NEARBY_TRASHCANS(404, "근처에 쓰레기통이 존재하지 않습니다."),
+    NOT_EXIST_REFRESH_TOKEN(400, "리프레시 토큰이 존재하지 않습니다."),
+    EXPIRED_REFRESH_TOKEN(400, "리프레시 토큰이 만료되었습니다."),
+    INVALID_REFRESH_TOKEN(400, "유효하지 않은 리프레시 토큰입니다.");
 
     private final int code;
     private final String message;
