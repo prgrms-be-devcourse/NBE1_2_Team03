@@ -32,11 +32,7 @@ public class ProductImgServiceImpl implements ProductImgService {
         for (ProductImg productImg : productImgs) {
             Long productId = productImg.getProductId();
 
-            if (!productImgsMap.containsKey(productId)) {
-                productImgsMap.put(productId, new ArrayList<>());
-            }
-
-            productImgsMap.get(productId).add(productImg);
+            productImgsMap.computeIfAbsent(productId, k -> new ArrayList<>()).add(productImg);
         }
 
         return productImgsMap;
