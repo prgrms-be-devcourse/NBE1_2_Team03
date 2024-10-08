@@ -1,9 +1,7 @@
 package com.sscanner.team.user.controller;
 
 import com.sscanner.team.global.common.response.ApiResponse;
-import com.sscanner.team.global.exception.BadRequestException;
-import com.sscanner.team.global.exception.DuplicateException;
-import com.sscanner.team.global.exception.ExceptionCode;
+import com.sscanner.team.jwt.JWTUtil;
 import com.sscanner.team.user.requestDto.UserJoinRequestDto;
 import com.sscanner.team.user.responseDto.UserJoinResponseDto;
 import com.sscanner.team.user.service.UserService;
@@ -17,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final JWTUtil jwtUtil;
+
 
     // 회원가입 기능
     @PostMapping("/join")
@@ -31,5 +31,6 @@ public class UserController {
     }
 
 
-
 }
+
+
