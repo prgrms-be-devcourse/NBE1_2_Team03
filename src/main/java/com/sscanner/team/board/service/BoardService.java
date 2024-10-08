@@ -1,5 +1,6 @@
 package com.sscanner.team.board.service;
 
+import com.sscanner.team.admin.responsedto.AdminBoardInfoResponseDTO;
 import com.sscanner.team.board.entity.Board;
 import com.sscanner.team.board.requestdto.BoardCreateRequestDTO;
 import com.sscanner.team.board.requestdto.BoardUpdateRequestDTO;
@@ -23,6 +24,6 @@ public interface BoardService {
     BoardListResponseDTO getBoardList(BoardCategory boardCategory, TrashCategory trashCategory,
                                          Integer page, Integer size);
     BoardResponseDTO getBoardDetailed(Long boardId);
-
+    BoardLocationInfoResponseDTO getBoardLocationInfo(Long boardId);
     Board getBoard(Long boardId);
 }

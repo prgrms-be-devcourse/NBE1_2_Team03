@@ -14,10 +14,4 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Page<Board> findAllByCategories(@Param("boardCategory") BoardCategory boardCategory,
                                                        @Param("trashCategory")TrashCategory trashCategory,
                                                        Pageable pageable);
-
-    @Query("select b from Board b where b.approvalStatus = :approvalStatus and b.boardCategory = :boardCategory and b.trashCategory = :trashCategory")
-    Page<Board> findAllByStatusAndCategories(@Param("approvalStatus") ApprovalStatus approvalStatus,
-                                           @Param("boardCategory") BoardCategory boardCategory,
-                                           @Param("trashCategory")TrashCategory trashCategory,
-                                           Pageable pageable);
 }
