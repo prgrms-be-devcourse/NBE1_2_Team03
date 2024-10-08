@@ -10,8 +10,8 @@ import com.sscanner.team.board.responsedto.BoardListResponseDTO;
 import com.sscanner.team.board.responsedto.BoardResponseDTO;
 import com.sscanner.team.board.type.BoardCategory;
 import com.sscanner.team.global.exception.BadRequestException;
+import com.sscanner.team.global.utils.UserUtils;
 import com.sscanner.team.trashcan.type.TrashCategory;
-import com.sscanner.team.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,7 +33,7 @@ public class BoardServiceImpl implements BoardService{
 
     private final BoardRepository boardRepository;
     private final BoardImgService boardImgService;
-    private final UserRepository userRepository;
+    private final UserUtils userUtils;
 
     /**
      * 추가, 수정, 삭제 신고 게시글 등록
@@ -45,15 +45,15 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public BoardResponseDTO createBoard(BoardCreateRequestDTO boardCreateRequestDTO,
                                         List<MultipartFile> files) {
-        User user = userRepository.findById(boardCreateRequestDTO.userId()).get();
-        // null에 user 들어갈 예정
-        Board addBoard = boardCreateRequestDTO.toEntityAddBoard(user);
+        User user = userUtils.getUser();
 
-        Board savedAddBoard = boardRepository.save(addBoard);
+        Board board = boardCreateRequestDTO.toEntityBoard(user);
 
-        List<BoardImg> boardImgs = boardImgService.saveBoardImg(savedAddBoard.getId(), files);
+        Board savedBoard = boardRepository.save(board);
 
-        return BoardResponseDTO.of(savedAddBoard, boardImgs);
+        List<BoardImg> boardImgs = boardImgService.saveBoardImg(savedBoard.getId(), files);
+
+        return BoardResponseDTO.of(savedBoard, boardImgs);
     }
 
     /**

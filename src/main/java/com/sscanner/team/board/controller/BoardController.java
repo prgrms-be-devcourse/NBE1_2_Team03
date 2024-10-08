@@ -23,12 +23,12 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @PostMapping()
+    @PostMapping
     public ApiResponse<BoardResponseDTO> createAddBoard(@Valid @RequestPart(value = "data") BoardCreateRequestDTO boardCreateRequestDTO,
                                                         @RequestPart(value = "files") List<MultipartFile> files) {
         BoardResponseDTO board = boardService.createBoard(boardCreateRequestDTO, files);
 
-        return ApiResponse.ok(201, board, "쓰레기통 신고 게시글 저장 완료!!");
+        return ApiResponse.ok(201, board, "신고 게시글 저장 완료!!");
     }
 
     @DeleteMapping("/{boardId}")
