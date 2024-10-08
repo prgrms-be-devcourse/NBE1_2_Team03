@@ -84,16 +84,14 @@ public class BoardServiceImpl implements BoardService{
     public BoardResponseDTO updateBoard(Long boardId,
                                            BoardUpdateRequestDTO boardUpdateRequestDTO,
                                            List<MultipartFile> files) {
+        User user = userUtils.getUser();
         Board board = getBoard(boardId);
+
+        isMatchAuthor(user, board);
 
         board.updateBoardInfo(boardUpdateRequestDTO);
 
-        List<BoardImg> boardImgs;
-        if(files.get(0).isEmpty()) {
-            boardImgs = boardImgService.getBoardImgs(boardId);
-        } else {
-            boardImgs = boardImgService.updateBoardImgs(board.getId(), files);
-        }
+        List<BoardImg> boardImgs = getUpdatedImages(files, boardId);
 
         return BoardResponseDTO.of(board, boardImgs);
     }
@@ -136,10 +134,18 @@ public class BoardServiceImpl implements BoardService{
                 .findById(boardId)
                 .orElseThrow(() -> new BadRequestException(NOT_EXIST_BOARD));
     }
+
     private void isMatchAuthor(User user, Board board) {
         if(!board.getUser().equals(user)) {
             throw new BadRequestException(MISMATCH_BOARD_AUTHOR);
         }
     }
 
+    private List<BoardImg> getUpdatedImages(List<MultipartFile> files, Long boardId) {
+        if(files.get(0).isEmpty()) {
+            return boardImgService.getBoardImgs(boardId);
+        } else {
+            return boardImgService.updateBoardImgs(boardId, files);
+        }
+    }
 }

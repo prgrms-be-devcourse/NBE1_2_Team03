@@ -42,9 +42,11 @@ public class BoardController {
     public ApiResponse<BoardResponseDTO> updateBoard(@PathVariable Long boardId,
                                      @Valid @RequestPart(value = "data") BoardUpdateRequestDTO boardUpdateRequestDTO,
                                      @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+                                                     @Valid @RequestPart(value = "data") BoardUpdateRequestDTO boardUpdateRequestDTO,
+                                                     @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         BoardResponseDTO board = boardService.updateBoard(boardId, boardUpdateRequestDTO, files);
 
-        return ApiResponse.ok(200, board, "게시판 수정 완료!!");
+        return ApiResponse.ok(200, board, "신고 게시글 수정 완료!!");
     }
 
     @GetMapping()
