@@ -1,8 +1,6 @@
 package com.sscanner.team.jwt;
 
 import com.sscanner.team.User;
-import com.sscanner.team.global.exception.BadRequestException;
-import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.responseDto.UserDetailsImpl;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -26,13 +24,14 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        // 헤더에서 토큰 꺼냄
-        String accessToken = request.getHeader("access");
+        String authorizationHeader = request.getHeader("Authorization");
 
-        if (accessToken == null) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
+
+        String accessToken = authorizationHeader.substring(7);
 
         // 토큰 만료 여부 확인
         try {
