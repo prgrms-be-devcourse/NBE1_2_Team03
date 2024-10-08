@@ -11,6 +11,7 @@ import org.hibernate.annotations.ColumnDefault;
 import java.time.Instant;
 import java.util.UUID;
 
+@Setter
 @Getter
 @Entity
 @NoArgsConstructor

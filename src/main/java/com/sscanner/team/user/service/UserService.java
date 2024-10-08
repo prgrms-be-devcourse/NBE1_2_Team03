@@ -7,8 +7,11 @@ import com.sscanner.team.global.exception.DuplicateException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.repository.UserRepository;
 import com.sscanner.team.user.requestDto.UserJoinRequestDto;
+import com.sscanner.team.user.requestDto.UserUpdateRequestDto;
 import com.sscanner.team.user.responseDto.UserMypageResponseDto;
 import com.sscanner.team.user.responseDto.UserJoinResponseDto;
+import com.sscanner.team.user.responseDto.UserUpdateResponseDto;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -72,6 +75,32 @@ public class UserService {
         UserMypageResponseDto responseDto = UserMypageResponseDto.create(user);
         return ApiResponse.ok(responseDto, "마이페이지 조회");
     }
+
+    // 회원정보 수정
+    @Transactional
+    public UserUpdateResponseDto updateUserInfo(UserUpdateRequestDto req){
+
+        User user = userUtils.getUser();
+
+        String nickname = req.nickname();
+        String phone = req.phone();
+
+        if (nickname!= null && !user.getNickname().equals(nickname)) {
+            checkDuplicatedNickname(nickname);
+            user.setNickname(nickname);
+        }
+
+        if (phone != null && !user.getPhone().equals(phone)) {
+            checkDuplicatedPhone(phone);
+            user.setPhone(phone);
+        }
+
+        userRepository.save(user);
+
+        return UserUpdateResponseDto.from(user);
+    }
+
+
 
 
 
