@@ -1,7 +1,6 @@
 package com.sscanner.team.jwt;
 
-import com.sscanner.team.global.exception.BadRequestException;
-import com.sscanner.team.global.exception.ExceptionCode;
+
 import com.sscanner.team.user.entity.Refresh;
 import com.sscanner.team.user.repository.RefreshRepository;
 import jakarta.servlet.FilterChain;
@@ -15,12 +14,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
+
 
 @RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
@@ -45,17 +43,18 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         //유저 정보 가져옴
         String email = authentication.getName();
-
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
-        String authority = auth.getAuthority();
+        String authority = authorities.iterator().next().getAuthority();
 
         // 토큰 생성 및 저장
-        String access = jwtUtil.createJwt("access", email, authority, 20000L);
+        String access = jwtUtil.createJwt("access", email, authority, 2000000L);
         String refresh = jwtUtil.createJwt("refresh", email, authority, 86400000L);
 
         addRefreshEntity(email, refresh, 86400000L);
+
+        // SecurityContextHolder에 인증 정보 설정
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
         response.setHeader("access", access);
         response.addCookie(createCookie("refresh", refresh));
@@ -71,9 +70,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private void addRefreshEntity(String username, String refresh, Long expiredMs) {
 
         Date date = new Date(System.currentTimeMillis() + expiredMs);
-
         Refresh refreshEntity = new Refresh(username, refresh, date.toString());
-
         refreshRepository.save(refreshEntity);
     }
 
@@ -82,13 +79,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24*60*60);
         cookie.setSecure(true);  // https통신 진행시
-        //cookie.setPath("/");  // 쿠키가 적용될 범위
+        cookie.setPath("/");  // 쿠키가 적용될 범위
         cookie.setHttpOnly(true);
 
         return cookie;
     }
 
 }
+
 
 
 
