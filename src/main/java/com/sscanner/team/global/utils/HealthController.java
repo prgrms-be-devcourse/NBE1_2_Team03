@@ -1,4 +1,4 @@
-package com.sscanner.team;
+package com.sscanner.team.global.utils;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
