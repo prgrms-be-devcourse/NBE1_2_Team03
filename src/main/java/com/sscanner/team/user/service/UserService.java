@@ -100,6 +100,28 @@ public class UserService {
         return UserUpdateResponseDto.from(user);
     }
 
+    // 비밀번호 수정
+    @Transactional
+    public String changePassword(String currentPassword, String newPassword, String newPasswordConfirm) {
+
+        User user = userUtils.getUser();
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new BadRequestException(ExceptionCode.CURRENT_PASSWORD_NOT_MATCH);
+        }
+
+        if (!newPassword.equals(newPasswordConfirm)) {
+            throw new BadRequestException(ExceptionCode.PASSWORD_NOT_MATCH);
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return "비밀번호가 성공적으로 변경되었습니다.";
+
+    }
+
+
 
 
 
