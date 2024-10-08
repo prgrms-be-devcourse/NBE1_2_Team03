@@ -1,23 +1,21 @@
 package com.sscanner.team.board.responsedto;
 
-import com.sscanner.team.board.entity.Board;
 import com.sscanner.team.board.type.BoardCategory;
 import com.sscanner.team.trashcan.type.TrashCategory;
+import org.springframework.data.domain.Page;
 
 public record BoardListResponseDTO(
-        Long id,
         BoardCategory boardCategory,
-        String roadNameAddress,
-        String detailedAddress,
-        TrashCategory trashCategory
+        TrashCategory trashCategory,
+        Page<BoardInfoResponseDTO> boardList
 ) {
-    public static BoardListResponseDTO from(Board board) {
+    public static BoardListResponseDTO from(BoardCategory boardCategory,
+                                            TrashCategory trashCategory,
+                                            Page<BoardInfoResponseDTO> boardList) {
         return new BoardListResponseDTO(
-                board.getId(),
-                board.getBoardCategory(),
-                board.getRoadNameAddress(),
-                board.getDetailedAddress(),
-                board.getTrashCategory()
+                boardCategory,
+                trashCategory,
+                boardList
         );
     }
 }

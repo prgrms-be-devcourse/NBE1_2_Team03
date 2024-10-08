@@ -6,6 +6,7 @@ import com.sscanner.team.board.entity.BoardImg;
 import com.sscanner.team.board.repository.BoardRepository;
 import com.sscanner.team.board.requestdto.BoardCreateRequestDTO;
 import com.sscanner.team.board.requestdto.BoardUpdateRequestDTO;
+import com.sscanner.team.board.responsedto.BoardInfoResponseDTO;
 import com.sscanner.team.board.responsedto.BoardListResponseDTO;
 import com.sscanner.team.board.responsedto.BoardResponseDTO;
 import com.sscanner.team.board.type.BoardCategory;
@@ -105,13 +106,18 @@ public class BoardServiceImpl implements BoardService{
      * @return Page<BoardListResponseDTO>
      */
     @Override
-    public Page<BoardListResponseDTO> getBoardList(BoardCategory boardCategory, TrashCategory trashCategory,
+    public BoardListResponseDTO getBoardList(BoardCategory boardCategory, TrashCategory trashCategory,
                                                 Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.DESC, "updatedAt");
 
-        Page<Board> boards = boardRepository.findAllByBoardCategoryAndTrashCategory(boardCategory, trashCategory, pageRequest);
+        Page<Board> boards = boardRepository.findAllByCategories(boardCategory, trashCategory, pageRequest);
 
-        return boards.map(board -> BoardListResponseDTO.from(board));
+        Page<BoardInfoResponseDTO> boardInfos = boards.map(board -> {
+            List<BoardImg> boardImgs = boardImgService.getBoardImgs(board.getId());
+            return BoardInfoResponseDTO.of(board, boardImgs.get(0).getBoardImgUrl());
+        });
+
+        return BoardListResponseDTO.from(boardCategory, trashCategory, boardInfos);
     }
 
     /**
