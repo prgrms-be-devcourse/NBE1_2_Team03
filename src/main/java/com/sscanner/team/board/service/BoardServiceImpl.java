@@ -8,6 +8,7 @@ import com.sscanner.team.board.requestdto.BoardCreateRequestDTO;
 import com.sscanner.team.board.requestdto.BoardUpdateRequestDTO;
 import com.sscanner.team.board.responsedto.BoardInfoResponseDTO;
 import com.sscanner.team.board.responsedto.BoardListResponseDTO;
+import com.sscanner.team.board.responsedto.BoardLocationInfoResponseDTO;
 import com.sscanner.team.board.responsedto.BoardResponseDTO;
 import com.sscanner.team.board.type.BoardCategory;
 import com.sscanner.team.global.exception.BadRequestException;
@@ -132,6 +133,18 @@ public class BoardServiceImpl implements BoardService{
         List<BoardImg> boardImgs = boardImgService.getBoardImgs(boardId);
 
         return BoardResponseDTO.of(board, boardImgs);
+    }
+
+    /**
+     * 게시글 위치 정보 조회
+     * @param boardId - 게시글 id
+     * @return BoardLocationInfoResponseDTO 위치 정보
+     */
+    @Override
+    public BoardLocationInfoResponseDTO getBoardLocationInfo(Long boardId) {
+        Board board = getBoard(boardId);
+
+        return BoardLocationInfoResponseDTO.from(board);
     }
 
     @Override
