@@ -35,7 +35,7 @@ public class BoardController {
     public ApiResponse<?> deleteBoard(@PathVariable Long boardId) {
         boardService.deleteBoard(boardId);
 
-        return ApiResponse.ok(200, "게시판 삭제 완료!!");
+        return ApiResponse.ok(200, "신고 게시글 삭제 완료!!");
     }
 
     @PatchMapping("/{boardId}")

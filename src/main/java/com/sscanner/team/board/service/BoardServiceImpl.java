@@ -63,11 +63,13 @@ public class BoardServiceImpl implements BoardService{
     @Transactional
     @Override
     public void deleteBoard(Long boardId) {
+        User user = userUtils.getUser();
         Board board = getBoard(boardId);
 
-        boardImgService.deleteBoardImgs(board.getId());
+        isMatchAuthor(user, board);
 
         boardRepository.delete(board);
+        boardImgService.deleteBoardImgs(boardId);
     }
 
     /**
@@ -133,6 +135,11 @@ public class BoardServiceImpl implements BoardService{
         return boardRepository
                 .findById(boardId)
                 .orElseThrow(() -> new BadRequestException(NOT_EXIST_BOARD));
+    }
+    private void isMatchAuthor(User user, Board board) {
+        if(!board.getUser().equals(user)) {
+            throw new BadRequestException(MISMATCH_BOARD_AUTHOR);
+        }
     }
 
 }
