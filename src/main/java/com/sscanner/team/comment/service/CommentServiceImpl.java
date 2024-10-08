@@ -7,7 +7,7 @@ import com.sscanner.team.comment.repository.CommentRepository;
 import com.sscanner.team.comment.requestdto.CommentCreateRequestDTO;
 import com.sscanner.team.comment.responsedto.CommentResponseDTO;
 import com.sscanner.team.global.exception.BadRequestException;
-import com.sscanner.team.user.repository.UserRepository;
+import com.sscanner.team.global.utils.UserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +19,7 @@ import static com.sscanner.team.global.exception.ExceptionCode.*;
 public class CommentServiceImpl implements CommentService{
 
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
+    private final UserUtils userUtils;
     private final BoardService boardService;
 
     @Override
@@ -27,7 +27,7 @@ public class CommentServiceImpl implements CommentService{
     public CommentResponseDTO saveComment(CommentCreateRequestDTO commentCreateRequestDTO) {
         boardService.getBoard(commentCreateRequestDTO.boardId());
 
-        User user = userRepository.findById(commentCreateRequestDTO.userId()).get();
+        User user = userUtils.getUser();
 
         Comment comment = commentCreateRequestDTO.toEntityComment(user);
 

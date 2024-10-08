@@ -22,9 +22,9 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commmentId}")
-    public ApiResponse<?> deleteComment(@PathVariable Long commmentId) {
+    public ApiResponse<Void> deleteComment(@PathVariable Long commmentId) {
         commentService.deleteComment(commmentId);
 
-        return ApiResponse.ok(200, "댓글 삭제 완료!!");
+        return ApiResponse.ok(200, null, "댓글 삭제 완료!!");
     }
 }
