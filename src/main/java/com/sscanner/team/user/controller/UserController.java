@@ -4,6 +4,7 @@ import com.sscanner.team.global.common.response.ApiResponse;
 import com.sscanner.team.jwt.JWTUtil;
 import com.sscanner.team.user.requestDto.UserJoinRequestDto;
 import com.sscanner.team.user.responseDto.UserJoinResponseDto;
+import com.sscanner.team.user.responseDto.UserMypageResponseDto;
 import com.sscanner.team.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,13 @@ public class UserController {
         return ApiResponse.ok(201, null, "회원가입 성공");
 
     }
+
+    // 마이페이지
+    @GetMapping("/my-page")
+    public ApiResponse<UserMypageResponseDto> getMypage(){
+        return userService.getMypage();
+    }
+
 
 
 }
