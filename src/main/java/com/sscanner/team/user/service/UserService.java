@@ -1,15 +1,18 @@
 package com.sscanner.team.user.service;
 
 import com.sscanner.team.User;
+import com.sscanner.team.global.common.response.ApiResponse;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.DuplicateException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.repository.UserRepository;
 import com.sscanner.team.user.requestDto.UserJoinRequestDto;
+import com.sscanner.team.user.responseDto.UserMypageResponseDto;
 import com.sscanner.team.user.responseDto.UserJoinResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.sscanner.team.global.utils.UserUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserUtils userUtils;
 
     // 이메일 중복 체크
     private void checkDuplicatedEmail(final String email) {
@@ -60,6 +64,15 @@ public class UserService {
 
         return UserJoinResponseDto.from(userEntity);
     }
+
+    // 마이페이지 조회
+    public ApiResponse<UserMypageResponseDto> getMypage() {
+
+        User user = userUtils.getUser();
+        UserMypageResponseDto responseDto = UserMypageResponseDto.create(user);
+        return ApiResponse.ok(responseDto, "마이페이지 조회");
+    }
+
 
 
 
