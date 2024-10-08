@@ -121,12 +121,12 @@ public class UserService {
 
     }
 
-
-
-
-
-
-
+    // 회원 탈퇴
+    @Transactional
+    public void deleteUser(){
+        User user = userUtils.getUser();
+        userRepository.delete(user);
+    }
 }
 
 

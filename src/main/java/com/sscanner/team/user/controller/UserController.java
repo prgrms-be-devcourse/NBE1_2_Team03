@@ -58,10 +58,12 @@ public class UserController {
         return ApiResponse.ok(message, "비밀번호 수정 성공");
     }
 
-
-
-
-
+    //회원 탈퇴
+    @DeleteMapping("/delete")
+    public ApiResponse<?> deleteUSer(){
+        userService.deleteUser();
+        return ApiResponse.ok(200, "회원 탈퇴 성공");
+    }
 }
 
 

@@ -2,19 +2,16 @@ package com.sscanner.team;
 
 import com.sscanner.team.global.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-
-import java.time.Instant;
-import java.util.UUID;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Setter
 @Getter
 @Entity
-@NoArgsConstructor
+@SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE user_id = ?")
+@Where(clause = "deleted_at is NULL")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "USER")
 public class User extends BaseEntity {
 
