@@ -1,7 +1,6 @@
 package com.sscanner.team.board.service;
 
 import com.sscanner.team.User;
-import com.sscanner.team.admin.responsedto.AdminBoardInfoResponseDTO;
 import com.sscanner.team.board.entity.Board;
 import com.sscanner.team.board.entity.BoardImg;
 import com.sscanner.team.board.repository.BoardRepository;

@@ -1,6 +1,5 @@
 package com.sscanner.team.board.service;
 
-import com.sscanner.team.admin.responsedto.AdminBoardInfoResponseDTO;
 import com.sscanner.team.board.entity.Board;
 import com.sscanner.team.board.requestdto.BoardCreateRequestDTO;
 import com.sscanner.team.board.requestdto.BoardUpdateRequestDTO;
@@ -9,7 +8,6 @@ import com.sscanner.team.board.responsedto.BoardLocationInfoResponseDTO;
 import com.sscanner.team.board.responsedto.BoardResponseDTO;
 import com.sscanner.team.board.type.BoardCategory;
 import com.sscanner.team.trashcan.type.TrashCategory;
-import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
