@@ -17,7 +17,7 @@ public class TimeTraceAspect {
         Object proceed = joinPoint.proceed();
         long executionTime = System.currentTimeMillis() - start;
 
-        log.info("{} 실행시간은~~~~~~~ {}ms", joinPoint.getSignature(), executionTime);
+        log.info("{} Execution time: {}ms", joinPoint.getSignature(), executionTime);
         return proceed;
     }
 }
