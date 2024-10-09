@@ -13,14 +13,12 @@ public class TestController {
     private TestService testService;
 
     @GetMapping("/test")
-    @TimeTrace
     public String test() {
         testService.testLogic();
         return "test";
     }
 
     @GetMapping("/err_test")
-    @TimeTrace
     public String error_test() throws Exception {
         testService.errorLogic();
         return "err";

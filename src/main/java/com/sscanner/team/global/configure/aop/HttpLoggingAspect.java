@@ -20,6 +20,7 @@ import java.util.UUID;
 @Slf4j
 public class HttpLoggingAspect {
 
+    private static long startTime;
 
     // Controller의 모든 메서드에 대해 적용
     @Pointcut("execution(* com.sscanner.team..controller.*.*(..))")
@@ -28,6 +29,7 @@ public class HttpLoggingAspect {
     @Before("pointCut()")
     public void logHttpRequest(JoinPoint joinPoint) {
         MDC.put("traceId", UUID.randomUUID().toString()); // 멀티 스레드 환경에서도 로그를 구분할 수 있게 해줌
+        startTime = System.currentTimeMillis();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         log.info("HTTP Request: {} {} from IP {}", request.getMethod(), request.getRequestURI(), request.getRemoteAddr());
     }
@@ -35,18 +37,22 @@ public class HttpLoggingAspect {
     // 메서드 호출 후 정상적으로 반환된 경우 로그 남기기
     @AfterReturning(pointcut = "pointCut()", returning = "result")
     public void logAfterReturning(JoinPoint joinPoint, Object result) {
-        log.info("Exiting method: {} with result {}", joinPoint.getSignature(), result);
+        log.info("Exiting Controller: {} with result {}", joinPoint.getSignature(), result);
     }
 
     // 예외 발생 시 로그 남기기
     @AfterThrowing(pointcut = "pointCut()", throwing = "ex")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable ex) {
         if(ex instanceof BadRequestException || ex instanceof DuplicateException || ex instanceof MethodArgumentNotValidException) return;
-        log.error("Exception in method: {} with arguments {}. Exception: {}", joinPoint.getSignature(), Arrays.toString(joinPoint.getArgs()), ex.getMessage(), ex);
+        log.error("Exception in Controller: {} with arguments {}. Exception: {}", joinPoint.getSignature(), Arrays.toString(joinPoint.getArgs()), ex.getMessage(), ex);
     }
 
+
+    // 완전히 종료된후 메서드 실행시간 측정하기
     @After("pointCut()")
-    public void MDCClear() {
+    public void logAfter(JoinPoint joinPoint) {
+        long executionTime = System.currentTimeMillis() - startTime;
+        log.info("{} Execution time: {}ms", joinPoint.getSignature(), executionTime);
         MDC.clear();
     }
 }

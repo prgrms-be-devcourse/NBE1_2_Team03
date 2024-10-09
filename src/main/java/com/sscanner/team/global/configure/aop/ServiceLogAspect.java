@@ -5,6 +5,7 @@ import com.sscanner.team.global.exception.DuplicateException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,9 @@ import java.util.UUID;
 @Aspect
 @Slf4j
 public class ServiceLogAspect {
+
+    private static long startTime;
+
     // service의 모든 메서드에 대해 적용
     @Pointcut("execution(* com.sscanner.team..service.*.*(..))")
     public void pointCut() {}
@@ -26,13 +30,22 @@ public class ServiceLogAspect {
     // 메서드 호출 전 로그 남기기
     @Before("pointCut()")
     public void logBefore(JoinPoint joinPoint) {
-        log.info("Entering method: {} with arguments {}", joinPoint.getSignature(), Arrays.toString(joinPoint.getArgs()));
+        startTime = System.currentTimeMillis();
+        log.info("Entering Service: {} with arguments {}", joinPoint.getSignature(), Arrays.toString(joinPoint.getArgs()));
     }
 
     // 메서드 호출 후 정상적으로 반환된 경우 로그 남기기
     @AfterReturning(pointcut = "pointCut()", returning = "result")
     public void logAfterReturning(JoinPoint joinPoint, Object result) {
-        log.info("Exiting method: {} with result {}", joinPoint.getSignature(), result);
+        log.info("Exiting Service: {} with result {}", joinPoint.getSignature(), result);
     }
 
+    // 완전히 종료된후 메서드 실행시간 측정하기
+    @After("pointCut()")
+    public void logAfter(JoinPoint joinPoint) {
+        long executionTime = System.currentTimeMillis() - startTime;
+        log.info("{} Execution time: {}ms", joinPoint.getSignature(), executionTime);
+    }
 }
+
+
