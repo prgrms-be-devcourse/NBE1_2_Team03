@@ -18,7 +18,11 @@ public record UserJoinRequestDto(
         String nickname,
 
         @NotBlank(message = "전화번호가 비어있습니다.")
-        String phone
+        String phone,
+
+        @NotBlank(message = "인증번호가 비어있습니다.")
+        String smsCode
+
 
 ) {
 

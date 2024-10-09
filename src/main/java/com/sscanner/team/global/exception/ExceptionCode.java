@@ -58,7 +58,8 @@ public enum ExceptionCode {
     NOT_EXIST_REFRESH_TOKEN(400, "리프레시 토큰이 존재하지 않습니다."),
     EXPIRED_REFRESH_TOKEN(400, "리프레시 토큰이 만료되었습니다."),
     INVALID_REFRESH_TOKEN(400, "유효하지 않은 리프레시 토큰입니다."),
-    CURRENT_PASSWORD_NOT_MATCH(400, "현재 비밀번호와 일치하지 않습니다.");
+    CURRENT_PASSWORD_NOT_MATCH(400, "현재 비밀번호와 일치하지 않습니다."),
+    UNAUTHORIZED(401, "인증에 실패했습니다.");
 
     private final int code;
     private final String message;

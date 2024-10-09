@@ -45,12 +45,8 @@ public class SecurityConfig {
 
         // 경로별 인가
         http.authorizeHttpRequests((authorize)->
-//                authorize.requestMatchers("/**").permitAll()
-//                        .requestMatchers("/reissue").permitAll()
-
-                authorize.requestMatchers("/login","/", "health","api/users/join").permitAll()
+                authorize.requestMatchers("/login","/", "health","api/users/join","/sms/**").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/reissue").permitAll()
                         .anyRequest().authenticated()
         );
 
