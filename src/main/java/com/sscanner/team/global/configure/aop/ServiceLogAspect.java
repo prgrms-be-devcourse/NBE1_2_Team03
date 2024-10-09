@@ -46,5 +46,3 @@ public class ServiceLogAspect {
         log.info("{} Execution time: {}ms", joinPoint.getSignature(), executionTime);
     }
 }
-
-
