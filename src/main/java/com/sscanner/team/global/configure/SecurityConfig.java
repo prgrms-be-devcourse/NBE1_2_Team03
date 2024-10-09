@@ -45,13 +45,13 @@ public class SecurityConfig {
 
         // 경로별 인가
         http.authorizeHttpRequests((authorize)->
-                authorize.requestMatchers("/**").permitAll()
-                        .requestMatchers("/reissue").permitAll()
-
-//                authorize.requestMatchers("/login","/","api/users/join").permitAll()
-//                        .requestMatchers("/admin").hasRole("ADMIN")
+//                authorize.requestMatchers("/**").permitAll()
 //                        .requestMatchers("/reissue").permitAll()
-//                        .anyRequest().authenticated()
+
+                authorize.requestMatchers("/login","/","api/users/join").permitAll()
+                        .requestMatchers("/admin").hasRole("ADMIN")
+                        .requestMatchers("/reissue").permitAll()
+                        .anyRequest().authenticated()
         );
 
         http.addFilterAfter(new JWTFilter(jwtUtil), LoginFilter.class);
