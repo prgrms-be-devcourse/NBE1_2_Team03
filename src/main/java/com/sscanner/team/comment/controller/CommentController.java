@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/comments")
@@ -27,5 +29,12 @@ public class CommentController {
         commentService.deleteComment(commmentId);
 
         return ApiResponse.ok(200, null, "댓글 삭제 완료!!");
+    }
+
+    @GetMapping("/{boardId}")
+    public ApiResponse<List<CommentResponseDTO>> getComments(@PathVariable Long boardId) {
+        List<CommentResponseDTO> comments = commentService.getComments(boardId);
+
+        return ApiResponse.ok(200, comments, "댓글 조회 완료!!");
     }
 }

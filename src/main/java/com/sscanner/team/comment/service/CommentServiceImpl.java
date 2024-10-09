@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.sscanner.team.global.exception.ExceptionCode.*;
 
 @Service
@@ -34,7 +37,7 @@ public class CommentServiceImpl implements CommentService{
 
         commentRepository.save(comment);
 
-        return CommentResponseDTO.of(comment, user);
+        return CommentResponseDTO.from(comment);
     }
 
     @Transactional
@@ -46,6 +49,15 @@ public class CommentServiceImpl implements CommentService{
         isMatchAuthor(user, comment);
 
         commentRepository.delete(comment);
+    }
+
+    @Override
+    public List<CommentResponseDTO> getComments(Long boardId) {
+        List<Comment> comments = commentRepository.findAllByBoardId(boardId);
+
+        return comments.stream()
+                .map(comment -> CommentResponseDTO.from(comment))
+                .collect(Collectors.toList());
     }
 
     private Comment getComment(Long commentId) {
