@@ -90,6 +90,7 @@ jobs:
           echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> docker-compose/.env
           echo "BASE_URL=${{ secrets.BASE_URL }}" >> docker-compose/.env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> docker-compose/.env
+          echo "SPRING_PROFILES_ACTIVE=prod" >> docker-compose/.env 
 
       - name: 압축하기
         run: tar -czvf $GITHUB_SHA.tar.gz appspec.yml scripts docker-compose
