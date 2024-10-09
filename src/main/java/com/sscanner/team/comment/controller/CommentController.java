@@ -4,6 +4,7 @@ import com.sscanner.team.comment.requestdto.CommentCreateRequestDTO;
 import com.sscanner.team.comment.responsedto.CommentResponseDTO;
 import com.sscanner.team.comment.service.CommentService;
 import com.sscanner.team.global.common.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +16,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ApiResponse<CommentResponseDTO> createComment(@RequestBody CommentCreateRequestDTO commentCreateRequestDTO) {
+    public ApiResponse<CommentResponseDTO> createComment(@Valid @RequestBody CommentCreateRequestDTO commentCreateRequestDTO) {
         CommentResponseDTO commentInfo = commentService.saveComment(commentCreateRequestDTO);
 
         return ApiResponse.ok(201, commentInfo, "댓글 생성 완료!!");

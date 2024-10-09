@@ -156,7 +156,7 @@ public class BoardServiceImpl implements BoardService{
 
     private void isMatchAuthor(User user, Board board) {
         if(!board.getUser().equals(user)) {
-            throw new BadRequestException(MISMATCH_BOARD_AUTHOR);
+            throw new BadRequestException(MISMATCH_AUTHOR);
         }
     }
 

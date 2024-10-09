@@ -45,7 +45,7 @@ public enum ExceptionCode {
     DAILY_POINTS_EXCEEDED(400, "일일 획득 포인트를 초과했습니다."),
     FILE_UPLOAD_FAIL(400,  "파일 업로드를 실패하였습니다."),
     MISMATCH_BOARD_TYPE(400, "신고 게시글 유형이 적절하지 않습니다"),
-    MISMATCH_BOARD_AUTHOR(400, "게시글 작성자가 아닙니다."),
+    MISMATCH_AUTHOR(400, "작성자가 일치하지 않습니다."),
 
     DUPLICATED_EMAIL(409, "이미 가입된 이메일입니다. "),
     DUPLICATED_NICKNAME(409, "이미 가입된 닉네임입니다. "),

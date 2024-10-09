@@ -16,6 +16,7 @@ import static com.sscanner.team.global.exception.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CommentServiceImpl implements CommentService{
 
     private final CommentRepository commentRepository;
@@ -39,7 +40,11 @@ public class CommentServiceImpl implements CommentService{
     @Transactional
     @Override
     public void deleteComment(Long commentId) {
+        User user = userUtils.getUser();
         Comment comment = getComment(commentId);
+
+        isMatchAuthor(user, comment);
+
         commentRepository.delete(comment);
     }
 
@@ -47,5 +52,11 @@ public class CommentServiceImpl implements CommentService{
         return commentRepository
                 .findById(commentId)
                 .orElseThrow(() -> new BadRequestException(NOT_EXIST_COMMENT));
+    }
+
+    private void isMatchAuthor(User user, Comment comment) {
+        if(!comment.getUser().equals(user)) {
+            throw new BadRequestException(MISMATCH_AUTHOR);
+        }
     }
 }
