@@ -16,3 +16,4 @@ services:
       - BUCKET_NAME
       - BASE_URL
       - JWT_SECRET
+      - SPRING_PROFILES_ACTIVE
