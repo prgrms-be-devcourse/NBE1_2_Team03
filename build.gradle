@@ -78,6 +78,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+    //nurigo 문자인증
+    implementation 'net.nurigo:sdk:4.3.0'
 }
 
 
