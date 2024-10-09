@@ -9,4 +9,5 @@ public interface CommentService {
     CommentResponseDTO saveComment(CommentCreateRequestDTO commentCreateRequestDTO);
     void deleteComment(Long commentId);
     List<CommentResponseDTO> getComments(Long boardId);
+    void deleteAll(Long boardId);
 }

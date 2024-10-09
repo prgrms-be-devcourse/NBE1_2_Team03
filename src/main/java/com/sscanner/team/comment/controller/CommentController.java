@@ -37,4 +37,11 @@ public class CommentController {
 
         return ApiResponse.ok(200, comments, "댓글 조회 완료!!");
     }
+
+    @DeleteMapping("/all/{boardId}")
+    public ApiResponse<Void> deleteAllComments(@PathVariable Long boardId) {
+        commentService.deleteAll(boardId);
+
+        return ApiResponse.ok(200, null, "모든 댓글 삭제 완료!!");
+    }
 }

@@ -60,6 +60,11 @@ public class CommentServiceImpl implements CommentService{
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void deleteAll(Long boardId) {
+        commentRepository.deleteAllByBoardId(boardId);
+    }
+
     private Comment getComment(Long commentId) {
         return commentRepository
                 .findById(commentId)
