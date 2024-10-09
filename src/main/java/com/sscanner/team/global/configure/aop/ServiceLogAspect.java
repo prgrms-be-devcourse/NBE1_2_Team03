@@ -1,0 +1,38 @@
+package com.sscanner.team.global.configure.aop;
+
+import com.sscanner.team.global.exception.BadRequestException;
+import com.sscanner.team.global.exception.DuplicateException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.*;
+import org.slf4j.MDC;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.util.Arrays;
+import java.util.UUID;
+
+@Component
+@Aspect
+@Slf4j
+public class ServiceLogAspect {
+    // service의 모든 메서드에 대해 적용
+    @Pointcut("execution(* com.sscanner.team..service.*.*(..))")
+    public void pointCut() {}
+
+    // 메서드 호출 전 로그 남기기
+    @Before("pointCut()")
+    public void logBefore(JoinPoint joinPoint) {
+        log.info("Entering method: {} with arguments {}", joinPoint.getSignature(), Arrays.toString(joinPoint.getArgs()));
+    }
+
+    // 메서드 호출 후 정상적으로 반환된 경우 로그 남기기
+    @AfterReturning(pointcut = "pointCut()", returning = "result")
+    public void logAfterReturning(JoinPoint joinPoint, Object result) {
+        log.info("Exiting method: {} with result {}", joinPoint.getSignature(), result);
+    }
+
+}
