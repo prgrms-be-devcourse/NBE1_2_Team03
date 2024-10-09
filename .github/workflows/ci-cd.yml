@@ -56,7 +56,7 @@ jobs:
         shell: bash
 
       - name: 빌드 및 테스트
-        run: ./gradlew clean build
+        run: ./gradlew build
       - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
         uses: aws-actions/configure-aws-credentials@v4
         with:
