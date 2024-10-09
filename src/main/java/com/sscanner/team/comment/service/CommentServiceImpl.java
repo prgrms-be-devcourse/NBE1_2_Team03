@@ -40,8 +40,8 @@ public class CommentServiceImpl implements CommentService{
         return CommentResponseDTO.from(comment);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void deleteComment(Long commentId) {
         User user = userUtils.getUser();
         Comment comment = getComment(commentId);
@@ -61,6 +61,7 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
+    @Transactional
     public void deleteAll(Long boardId) {
         commentRepository.deleteAllByBoardId(boardId);
     }
