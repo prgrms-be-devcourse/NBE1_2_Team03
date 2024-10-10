@@ -1,13 +1,16 @@
 package com.sscanner.team.products.controller;
 
 import com.sscanner.team.global.common.response.ApiResponse;
-import com.sscanner.team.products.responsedto.ProductResponseDto;
+import com.sscanner.team.products.responsedto.ProductUploadImgResponseDto;
+import com.sscanner.team.products.responsedto.ProductWithImgResponseDto;
 import com.sscanner.team.products.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -36,12 +39,28 @@ public class ProductController {
 
     /**
      * 단일 상품 정보 조회 API
+     * 이미지도 함께 반환합니다.
      * @param productId 상품 ID
      * @return 상품 정보 조회 성공 메시지
      */
     @GetMapping("/{productId}")
-    public ApiResponse<ProductResponseDto> getProductById(@PathVariable Long productId) {
-        ProductResponseDto product = productService.getProductById(productId);
+    public ApiResponse<ProductWithImgResponseDto> getProductById(@PathVariable Long productId) {
+        ProductWithImgResponseDto product = productService.getProductWithImgById(productId);
         return ApiResponse.ok(200, product, "상품 정보 조회 성공");
+    }
+
+    /**
+     * 상품 이미지 등록 API
+     * @param productId 상품 ID
+     * @param files 이미지 파일들 (다중 업로드 가능)
+     * @return 업로드된 이미지 정보 목록
+     */
+    @PostMapping("/{productId}/images")
+    public ApiResponse<List<ProductUploadImgResponseDto>> uploadProductImages(
+            @PathVariable Long productId,
+            @RequestParam("images") List<MultipartFile> files
+    ) {
+        List<ProductUploadImgResponseDto> uploadedImages = productService.addProductImages(productId, files);
+        return ApiResponse.ok(200, uploadedImages, "이미지 등록 성공");
     }
 }

@@ -1,56 +1,111 @@
 package com.sscanner.team.points.scheduler;
 
-import com.sscanner.team.UserPoint;
-import com.sscanner.team.points.repository.PointRepository;
+import com.sscanner.team.points.entity.UserPoint;
+import com.sscanner.team.points.service.PointService;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
-import static com.sscanner.team.points.common.PointConstants.DAILY_POINT_PREFIX;
-import static com.sscanner.team.points.common.PointConstants.POINT_PREFIX;
+import static com.sscanner.team.points.common.PointConstants.*;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class PointScheduler {
 
-    private final PointRepository pointRepository;
+    private final PointService pointService;
     private final RedisTemplate<String, Integer> redisTemplate;
+    private final ThreadPoolTaskExecutor taskExecutor;
 
-    @Scheduled(fixedRate = 300000, initialDelay = 300000) // 5분마다 실행
+    @PostConstruct
+    public void init() {
+        taskExecutor.setCorePoolSize(10);
+        taskExecutor.setMaxPoolSize(50);
+        taskExecutor.setQueueCapacity(100);
+        taskExecutor.setThreadNamePrefix("Async-Task-");
+        taskExecutor.initialize();
+    }
+
+    @Scheduled(fixedRate = 300000, initialDelay = 300000)
     public void backupPointsToMySQL() {
-        Set<String> keys = redisTemplate.keys(POINT_PREFIX + "*");
-        if (keys != null) {
-            for (String key : keys) {
-                String userId = key.replace(POINT_PREFIX, "");
-                Integer currentPoint = redisTemplate.opsForValue().get(key);
+        Set<String> flaggedUsers = pointService.getFlaggedUsersForBackup();
+        log.error(flaggedUsers.toString());
 
-                if (currentPoint != null) {
-                    CompletableFuture.runAsync(() -> {
-                        UserPoint userPoint = pointRepository.findByUserId(userId)
-                                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
-                        UserPoint updatedUserPoint = userPoint.updatePoint(currentPoint);
-                        pointRepository.save(updatedUserPoint);
-                    });
+        for (String flaggedUserId : flaggedUsers) {
+            String userId = flaggedUserId.replace(BACKUP_FLAG_PREFIX, "");
+            CompletableFuture.runAsync(() -> processUserBackup(userId), taskExecutor)
+                    .exceptionally(ex -> null);
+        }
+    }
+
+    private void processUserBackup(String userId) {
+        retryOnFailure(() -> {
+            Integer currentPoint = redisTemplate.opsForValue().get(POINT_PREFIX + userId);
+            if (currentPoint != null) {
+                UserPoint userPoint = pointService.findUserPointByUserId(userId);
+                pointService.updateUserPoints(userPoint, currentPoint);
+            }
+            // 백업이 완료된 후, 플래그를 삭제
+            redisTemplate.delete(BACKUP_FLAG_PREFIX + userId);
+        });
+    }
+
+    private void retryOnFailure(Runnable task) {
+        int attempts = 0;
+
+        while (attempts < RETRY_MAX_ATTEMPTS) {
+            try {
+                task.run();
+                return;
+            } catch (Exception e) {
+                attempts++;
+                if (attempts >= RETRY_MAX_ATTEMPTS) {
+                    break;
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException interruptedException) {
+                    Thread.currentThread().interrupt();
                 }
             }
         }
     }
 
-    /**
-     * 매일 00:00 일일 획득 가능 포인트를 초기화합니다.<br>
-     * Redis 에 등록된 key 삭제<br>
-     * key: DAILY_POINT_PREFIX + userId<br>
-     * value: 금일 획득한 포인트
-     */
     @Scheduled(cron = "0 0 0 * * ?")
     public void resetDailyPointLimit() {
-        Set<String> keys = redisTemplate.keys(DAILY_POINT_PREFIX + "*");
-        if (keys != null) {
-            redisTemplate.delete(keys);
+        ScanOptions scanOptions = ScanOptions.scanOptions().match(DAILY_POINT_PREFIX + "*").build();
+
+        try (Cursor<String> cursor = redisTemplate.scan(scanOptions)) {
+            while (cursor.hasNext()) {
+                String key = cursor.next();
+                redisTemplate.delete(key);
+            }
+        } catch (Exception e) {
+            log.error("Error during Redis SCAN operation", e);
+        }
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        taskExecutor.shutdown();
+        try {
+            if (!taskExecutor.getThreadPoolExecutor().awaitTermination(60, TimeUnit.SECONDS)) {
+                taskExecutor.getThreadPoolExecutor().shutdownNow();
+            }
+        } catch (InterruptedException ex) {
+            taskExecutor.getThreadPoolExecutor().shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 }

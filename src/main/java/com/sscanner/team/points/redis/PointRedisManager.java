@@ -1,38 +1,22 @@
-package com.sscanner.team.points.common;
+package com.sscanner.team.points.redis;
 
-import com.sscanner.team.UserPoint;
-import com.sscanner.team.global.exception.BadRequestException;
-import com.sscanner.team.global.exception.ExceptionCode;
-import com.sscanner.team.points.repository.PointRepository;
-import com.sscanner.team.points.requestdto.PointUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static com.sscanner.team.points.common.PointConstants.*;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class PointManager {
+public class PointRedisManager {
 
-    private final PointRepository pointRepository;
     private final RedisTemplate<String, Integer> redisTemplate;
-
-    private static final String POINT_PREFIX = "POINT_";
-    private static final String DAILY_POINT_PREFIX = "DAILY_POINT_";
-
-    public UserPoint findUserPointByUserId(String userId) {
-        return pointRepository.findByUserId(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
-    }
-
-    @Transactional
-    public void updateUserPointsInDb(PointUpdateRequestDto pointUpdateRequestDto) {
-        UserPoint updatedUserPoint = pointUpdateRequestDto.toEntity();
-        pointRepository.save(updatedUserPoint);
-    }
 
     public Integer getPointFromRedis(String userId) {
         return redisTemplate.opsForValue().get(getRedisKey(userId));
@@ -58,8 +42,22 @@ public class PointManager {
         redisTemplate.opsForValue().increment(getDailyRedisKey(userId), incrementValue);
     }
 
+    // 플래그를 저장하기 위한 Integer 사용 (1 = true, 0 = false)
+    public void flagUserForBackup(String userId) {
+        redisTemplate.opsForValue().set(BACKUP_FLAG_PREFIX + userId, 1);
+        log.error("{}", redisTemplate.opsForValue().get(BACKUP_FLAG_PREFIX + userId));
+    }
+
     private String getRedisKey(String userId) {
         return POINT_PREFIX + userId;
+    }
+
+    public Set<String> getFlaggedUsers() {
+        return redisTemplate.keys( BACKUP_FLAG_PREFIX+"*");
+    }
+
+    public Set<String> getAllKeys() {
+        return redisTemplate.keys(POINT_PREFIX + "*");
     }
 
     private String getDailyRedisKey(String userId) {
