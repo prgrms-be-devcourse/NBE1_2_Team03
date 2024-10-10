@@ -10,9 +10,6 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public record BoardUpdateRequestDTO(
-        @NotNull(message = "userId는 필수입니다.")
-        String userId,
-
         String significant,
 
         Long trashcanId,

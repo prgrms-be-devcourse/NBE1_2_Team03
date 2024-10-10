@@ -1,6 +1,5 @@
 package com.sscanner.team.comment.responsedto;
 
-import com.sscanner.team.User;
 import com.sscanner.team.comment.entity.Comment;
 
 public record CommentResponseDTO(
@@ -9,11 +8,11 @@ public record CommentResponseDTO(
         String authority,
         String content
 ) {
-    public static CommentResponseDTO of(Comment comment, User user) {
+    public static CommentResponseDTO from(Comment comment) {
         return new CommentResponseDTO(
                 comment.getId(),
-                user.getNickname(),
-                user.getAuthority(),
+                comment.getUser().getNickname(),
+                comment.getUser().getAuthority(),
                 comment.getContent()
         );
     }

@@ -10,9 +10,6 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 public record BoardCreateRequestDTO(
-        @NotNull(message = "userId는 필수입니다.")
-        String userId,
-
         @NotNull(message = "게시판 유형 작성은 필수입니다.")
         BoardCategory boardCategory,
 
@@ -42,7 +39,7 @@ public record BoardCreateRequestDTO(
         @NotNull(message = "쓰레기통 상태 작성은 필수입니다.")
         TrashcanStatus updatedTrashcanStatus
 ) {
-        public Board toEntityAddBoard(User user) {
+        public Board toEntityBoard(User user) {
                 return Board.builder()
                         .user(user)
                         .boardCategory(this.boardCategory())

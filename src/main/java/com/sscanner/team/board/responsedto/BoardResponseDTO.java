@@ -6,7 +6,6 @@ import com.sscanner.team.board.type.BoardCategory;
 import com.sscanner.team.trashcan.type.TrashCategory;
 import com.sscanner.team.trashcan.type.TrashcanStatus;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,10 +14,6 @@ public record BoardResponseDTO(
     BoardCategory boardCategory,
     String significant,
     Long trashcanId,
-    BigDecimal latitude,
-    BigDecimal longitude,
-    String roadNameAddress,
-    String detailedAddress,
     TrashCategory trashCategory,
     TrashcanStatus updatedTrashcanStatus,
     List<BoardImgResponseDTO> boardImgs
@@ -29,10 +24,6 @@ public record BoardResponseDTO(
                 board.getBoardCategory(),
                 board.getSignificant(),
                 board.getTrashcanId(),
-                board.getLatitude(),
-                board.getLongitude(),
-                board.getRoadNameAddress(),
-                board.getDetailedAddress(),
                 board.getTrashCategory(),
                 board.getUpdatedTrashcanStatus(),
                 boardImgs.stream()

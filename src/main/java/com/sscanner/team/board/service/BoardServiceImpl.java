@@ -6,12 +6,14 @@ import com.sscanner.team.board.entity.BoardImg;
 import com.sscanner.team.board.repository.BoardRepository;
 import com.sscanner.team.board.requestdto.BoardCreateRequestDTO;
 import com.sscanner.team.board.requestdto.BoardUpdateRequestDTO;
+import com.sscanner.team.board.responsedto.BoardInfoResponseDTO;
 import com.sscanner.team.board.responsedto.BoardListResponseDTO;
+import com.sscanner.team.board.responsedto.BoardLocationInfoResponseDTO;
 import com.sscanner.team.board.responsedto.BoardResponseDTO;
 import com.sscanner.team.board.type.BoardCategory;
 import com.sscanner.team.global.exception.BadRequestException;
+import com.sscanner.team.global.utils.UserUtils;
 import com.sscanner.team.trashcan.type.TrashCategory;
-import com.sscanner.team.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,7 +35,7 @@ public class BoardServiceImpl implements BoardService{
 
     private final BoardRepository boardRepository;
     private final BoardImgService boardImgService;
-    private final UserRepository userRepository;
+    private final UserUtils userUtils;
 
     /**
      * 추가, 수정, 삭제 신고 게시글 등록
@@ -45,15 +47,15 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public BoardResponseDTO createBoard(BoardCreateRequestDTO boardCreateRequestDTO,
                                         List<MultipartFile> files) {
-        User user = userRepository.findById(boardCreateRequestDTO.userId()).get();
-        // null에 user 들어갈 예정
-        Board addBoard = boardCreateRequestDTO.toEntityAddBoard(user);
+        User user = userUtils.getUser();
 
-        Board savedAddBoard = boardRepository.save(addBoard);
+        Board board = boardCreateRequestDTO.toEntityBoard(user);
 
-        List<BoardImg> boardImgs = boardImgService.saveBoardImg(savedAddBoard.getId(), files);
+        Board savedBoard = boardRepository.save(board);
 
-        return BoardResponseDTO.of(savedAddBoard, boardImgs);
+        List<BoardImg> boardImgs = boardImgService.saveBoardImg(savedBoard.getId(), files);
+
+        return BoardResponseDTO.of(savedBoard, boardImgs);
     }
 
     /**
@@ -63,11 +65,13 @@ public class BoardServiceImpl implements BoardService{
     @Transactional
     @Override
     public void deleteBoard(Long boardId) {
+        User user = userUtils.getUser();
         Board board = getBoard(boardId);
 
-        boardImgService.deleteBoardImgs(board.getId());
+        isMatchAuthor(user, board);
 
         boardRepository.delete(board);
+        boardImgService.deleteBoardImgs(boardId);
     }
 
     /**
@@ -82,16 +86,14 @@ public class BoardServiceImpl implements BoardService{
     public BoardResponseDTO updateBoard(Long boardId,
                                            BoardUpdateRequestDTO boardUpdateRequestDTO,
                                            List<MultipartFile> files) {
+        User user = userUtils.getUser();
         Board board = getBoard(boardId);
+
+        isMatchAuthor(user, board);
 
         board.updateBoardInfo(boardUpdateRequestDTO);
 
-        List<BoardImg> boardImgs;
-        if(files.get(0).isEmpty()) {
-            boardImgs = boardImgService.getBoardImgs(boardId);
-        } else {
-            boardImgs = boardImgService.updateBoardImgs(board.getId(), files);
-        }
+        List<BoardImg> boardImgs = getUpdatedImages(files, boardId);
 
         return BoardResponseDTO.of(board, boardImgs);
     }
@@ -105,13 +107,18 @@ public class BoardServiceImpl implements BoardService{
      * @return Page<BoardListResponseDTO>
      */
     @Override
-    public Page<BoardListResponseDTO> getBoardList(BoardCategory boardCategory, TrashCategory trashCategory,
+    public BoardListResponseDTO getBoardList(BoardCategory boardCategory, TrashCategory trashCategory,
                                                 Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.DESC, "updatedAt");
 
-        Page<Board> boards = boardRepository.findAllByBoardCategoryAndTrashCategory(boardCategory, trashCategory, pageRequest);
+        Page<Board> boards = boardRepository.findAllByCategories(boardCategory, trashCategory, pageRequest);
 
-        return boards.map(board -> BoardListResponseDTO.from(board));
+        Page<BoardInfoResponseDTO> boardInfos = boards.map(board -> {
+            List<BoardImg> boardImgs = boardImgService.getBoardImgs(board.getId());
+            return BoardInfoResponseDTO.of(board, boardImgs.get(0).getBoardImgUrl());
+        });
+
+        return BoardListResponseDTO.from(boardCategory, trashCategory, boardInfos);
     }
 
     /**
@@ -128,6 +135,18 @@ public class BoardServiceImpl implements BoardService{
         return BoardResponseDTO.of(board, boardImgs);
     }
 
+    /**
+     * 게시글 위치 정보 조회
+     * @param boardId - 게시글 id
+     * @return BoardLocationInfoResponseDTO 위치 정보
+     */
+    @Override
+    public BoardLocationInfoResponseDTO getBoardLocationInfo(Long boardId) {
+        Board board = getBoard(boardId);
+
+        return BoardLocationInfoResponseDTO.from(board);
+    }
+
     @Override
     public Board getBoard(Long boardId) {
         return boardRepository
@@ -135,4 +154,17 @@ public class BoardServiceImpl implements BoardService{
                 .orElseThrow(() -> new BadRequestException(NOT_EXIST_BOARD));
     }
 
+    private void isMatchAuthor(User user, Board board) {
+        if(!board.getUser().equals(user)) {
+            throw new BadRequestException(MISMATCH_AUTHOR);
+        }
+    }
+
+    private List<BoardImg> getUpdatedImages(List<MultipartFile> files, Long boardId) {
+        if(files.get(0).isEmpty()) {
+            return boardImgService.getBoardImgs(boardId);
+        } else {
+            return boardImgService.updateBoardImgs(boardId, files);
+        }
+    }
 }

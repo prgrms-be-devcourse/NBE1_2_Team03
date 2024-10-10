@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("select b from Board b where b.boardCategory = :boardCategory and b.trashCategory = :trashCategory")
-    Page<Board> findAllByBoardCategoryAndTrashCategory(@Param("boardCategory") BoardCategory boardCategory,
+    Page<Board> findAllByCategories(@Param("boardCategory") BoardCategory boardCategory,
                                                        @Param("trashCategory")TrashCategory trashCategory,
                                                        Pageable pageable);
 }

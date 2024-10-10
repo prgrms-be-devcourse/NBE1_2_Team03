@@ -2,6 +2,7 @@ package com.sscanner.team.board.entity;
 
 import com.sscanner.team.User;
 import com.sscanner.team.board.requestdto.BoardUpdateRequestDTO;
+import com.sscanner.team.board.type.ApprovalStatus;
 import com.sscanner.team.board.type.BoardCategory;
 import com.sscanner.team.global.common.BaseEntity;
 import com.sscanner.team.trashcan.type.TrashCategory;
@@ -39,8 +40,9 @@ public class Board extends BaseEntity {
     @Column(name = "significants")
     private String significant;
 
-    @Column(name = "give_point", nullable = false)
-    private Boolean givePoint;
+    @Column(name = "approval_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ApprovalStatus approvalStatus;
 
     @Column(name = "trashcan_id")
     private Long trashcanId;
@@ -79,7 +81,7 @@ public class Board extends BaseEntity {
         this.user = user;
         this.boardCategory = boardCategory;
         this.significant = significant;
-        this.givePoint = false;
+        this.approvalStatus = ApprovalStatus.REVIEWING;
         this.trashcanId = trashcanId;
         this.latitude = latitude;
         this.longitude = longitude;
