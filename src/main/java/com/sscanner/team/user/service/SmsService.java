@@ -9,6 +9,7 @@ import com.sscanner.team.user.requestdto.SmsRequestDto;
 import com.sscanner.team.user.requestdto.SmsVerifyRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.security.SecureRandom;
 
 @RequiredArgsConstructor
 @Service
@@ -18,6 +19,8 @@ public class SmsService {
     private final SmsRepository smsRepository;
     private final UserRepository userRepository;
 
+    private static final SecureRandom secureRandom = new SecureRandom();
+
     public void SendSms(SmsRequestDto smsRequestDto) {
         String phoneNum = smsRequestDto.phoneNum();
 
@@ -25,9 +28,15 @@ public class SmsService {
             throw new BadRequestException(ExceptionCode.DUPLICATED_PHONE);
         }
 
-        String certificationCode = Integer.toString((int)(Math.random() * (999999 - 100000 + 1)) + 100000); // 인증 코드(6자리랜덤)
-        smsCertificationUtil.sendSMS(phoneNum, certificationCode);
-        smsRepository.createSmsCertification(phoneNum, certificationCode);
+        int certificationCode = secureRandom.nextInt(900000) + 100000; // 100000 ~ 999999 범위의 난수
+        String codeAsString = Integer.toString(certificationCode);
+
+        // SMS 전송
+        smsCertificationUtil.sendSMS(phoneNum, codeAsString);
+
+        // 인증 코드 저장
+        smsRepository.createSmsCertification(phoneNum, codeAsString);
+
     }
 
     public boolean verifyCode(SmsVerifyRequestDto smsVerifyDto) {
@@ -39,9 +48,9 @@ public class SmsService {
         }
     }
 
-    public boolean isVerify(String phoneNum, String code) {
-        return smsRepository.hasKey(phoneNum) && // 전화번호에 대한 키가 존재하고
-                smsRepository.getSmsCertification(phoneNum).equals(code); // 저장된 인증 코드와 입력된 인증 코드가 일치하는지 확인
+    public boolean isVerify(String phoneNum, String code) { // 전화번호에 대한 키 존재 + 인증코드 일치 검증
+        return smsRepository.hasKey(phoneNum) &&
+                smsRepository.getSmsCertification(phoneNum).equals(code);
     }
 
 }
