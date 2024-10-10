@@ -20,7 +20,7 @@ import java.util.UUID;
 @Slf4j
 public class HttpLoggingAspect {
 
-    private static long startTime;
+    private long startTime;
 
     // Controller의 모든 메서드에 대해 적용
     @Pointcut("execution(* com.sscanner.team..controller.*.*(..))")

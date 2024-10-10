@@ -21,7 +21,7 @@ import java.util.UUID;
 @Slf4j
 public class ServiceLogAspect {
 
-    private static long startTime;
+    private long startTime;
 
     // service의 모든 메서드에 대해 적용
     @Pointcut("execution(* com.sscanner.team..service.*.*(..))")
