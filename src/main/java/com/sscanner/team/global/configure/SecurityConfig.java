@@ -48,10 +48,10 @@ public class SecurityConfig {
 //                authorize.requestMatchers("/**").permitAll()
 //                        .requestMatchers("/reissue").permitAll()
 
-                authorize.requestMatchers("/login","/","api/users/join").permitAll()
-                        .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/reissue").permitAll()
-                        .anyRequest().authenticated()
+                        authorize.requestMatchers("/login","/","api/users/join","/sms/**").permitAll()
+                                .requestMatchers("/admin").hasRole("ADMIN")
+                                .requestMatchers("/reissue").permitAll()
+                                .anyRequest().authenticated()
         );
 
         http.addFilterAfter(new JWTFilter(jwtUtil), LoginFilter.class);
