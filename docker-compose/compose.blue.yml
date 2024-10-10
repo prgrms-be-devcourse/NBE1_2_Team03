@@ -16,3 +16,6 @@ services:
       - BUCKET_NAME
       - BASE_URL
       - JWT_SECRET
+      - COOLSMS_API_KEY
+      - COOLSMS_API_SECRET
+      - COOLSMS_PHONE_NUMBER
