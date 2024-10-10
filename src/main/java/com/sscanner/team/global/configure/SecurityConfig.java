@@ -48,7 +48,7 @@ public class SecurityConfig {
 //                authorize.requestMatchers("/**").permitAll()
 //                        .requestMatchers("/reissue").permitAll()
 
-                authorize.requestMatchers("/login","/","api/users/join").permitAll()
+                authorize.requestMatchers("/login","/", "health","api/users/join").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/reissue").permitAll()
                         .anyRequest().authenticated()
