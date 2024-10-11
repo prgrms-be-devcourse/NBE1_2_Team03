@@ -33,11 +33,15 @@ public class PaymentRecord extends BaseEntity {
     @Column(name = "payment", nullable = false)
     private Integer payment;
 
+    @Column(name = "barcode_url", nullable = false)
+    private String barcodeUrl;
+
     @Builder
-    public PaymentRecord(UUID paymentRecordId, User user, Product product, Integer payment) {
+    public PaymentRecord(UUID paymentRecordId, User user, Product product, Integer payment, String barcodeUrl) {
         this.paymentRecordId = paymentRecordId;
         this.user = user;
         this.product = product;
         this.payment = payment;
+        this.barcodeUrl = barcodeUrl;
     }
 }
