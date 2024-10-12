@@ -13,5 +13,6 @@ public interface TrashcanDocumentRepository extends ElasticsearchRepository<Tras
 
 
     List<TrashcanDocument> findByRoadNameAddressContaining(String roadNameAddress);
+    List<TrashcanDocument> findByRoadNameAddress(String roadNameAddress);
 }
 
