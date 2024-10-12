@@ -29,7 +29,7 @@ public record UserJoinRequestDto(
                 .password(encodedPassword)
                 .nickname(nickname)
                 .phone(phone)
-                .authority("USER")
+                .authority("ROLE_USER")
                 .build();
     }
 
