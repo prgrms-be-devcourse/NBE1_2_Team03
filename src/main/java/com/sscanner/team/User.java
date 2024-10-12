@@ -6,7 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-@Setter
+
 @Getter
 @Entity
 @SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE user_id = ?")
@@ -42,6 +42,27 @@ public class User extends BaseEntity {
         this.nickname = nickname;
         this.phone = phone;
         this.authority = authority;
+
+    }
+
+    public void changeNickname(String newNickname) {
+        this.nickname = newNickname;
+    }
+
+    public void changePhone(String newPhone) {
+        this.phone = newPhone;
+    }
+
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
+    public boolean isNicknameEqual(String nickname) {
+        return this.nickname.equals(nickname);
+    }
+
+    public boolean isPhoneEqual(String phone) {
+        return this.phone.equals(phone);
     }
 
 }
