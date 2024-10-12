@@ -123,4 +123,9 @@ public class TrashcanServiceImpl implements TrashcanService {
         return TrashcanResponseDto.from(trashcan);
     }
 
+    public List<Trashcan> findAllTrashcan(){
+        return trashcanRepository.findAll();
+    }
+
 }
+
