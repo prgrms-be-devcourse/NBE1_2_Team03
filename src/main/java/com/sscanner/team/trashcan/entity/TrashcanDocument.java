@@ -8,27 +8,28 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.math.BigDecimal;
 
+@Getter
 @Document(indexName = "trashcan")
 public class TrashcanDocument {
 
     @Id
-    private String id;
+    private Long id;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Keyword)
     private String roadNameAddress;
 
     @Field(type = FieldType.Double)
-    private Double latitude;
+    private BigDecimal latitude;
 
     @Field(type = FieldType.Double)
-    private Double longitude;
+    private BigDecimal longitude;
 
     @Builder
-    public TrashcanDocument(String id, String roadNameAddress, BigDecimal latitude, BigDecimal longitude) {
+    public TrashcanDocument(Long id, String roadNameAddress, BigDecimal latitude, BigDecimal longitude) {
         this.id = id;
         this.roadNameAddress = roadNameAddress;
-        this.latitude = latitude.doubleValue();
-        this.longitude = longitude.doubleValue();
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
 
