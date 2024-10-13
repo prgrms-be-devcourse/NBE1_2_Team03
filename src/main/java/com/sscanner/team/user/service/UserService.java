@@ -7,10 +7,8 @@ import com.sscanner.team.global.exception.DuplicateException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.repository.UserRepository;
 import com.sscanner.team.user.requestDto.UserJoinRequestDto;
-import com.sscanner.team.user.requestDto.UserUpdateRequestDto;
-import com.sscanner.team.user.responseDto.UserMypageResponseDto;
-import com.sscanner.team.user.responseDto.UserJoinResponseDto;
-import com.sscanner.team.user.responseDto.UserUpdateResponseDto;
+import com.sscanner.team.user.requestDto.UserPasswordChangeRequestDto;
+import com.sscanner.team.user.responseDto.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -46,11 +44,20 @@ public class UserService {
         }
     }
 
-    // 비밀번호 확인용 메서드
+    // 비밀번호 확인용 메서드 (비번 , 비번확인 같은지)
     public void confirmPassword(String password, String passwordCheck) {
         if(!password.equals(passwordCheck)) {
             throw new BadRequestException(ExceptionCode.PASSWORD_NOT_MATCH);
         }
+    }
+
+    // 비밀번호 수정 시 검증
+    private void validatePasswordChange(UserPasswordChangeRequestDto requestDto, User user) {
+        if (!passwordEncoder.matches(requestDto.currentPassword(), user.getPassword())) {
+            throw new BadRequestException(ExceptionCode.CURRENT_PASSWORD_NOT_MATCH);
+        }
+
+        confirmPassword(requestDto.newPassword(), requestDto.confirmNewPassword());
     }
 
     // 회원가입
@@ -76,45 +83,54 @@ public class UserService {
         return ApiResponse.ok(responseDto, "마이페이지 조회");
     }
 
-    // 회원정보 수정
-    @Transactional
-    public UserUpdateResponseDto updateUserInfo(UserUpdateRequestDto req){
 
+    // 비밀번호 확인 (현재 비밀번호 확인)
+    public boolean confirmPassword(String password){
         User user = userUtils.getUser();
 
-        String nickname = req.nickname();
-        String phone = req.phone();
-
-        if (nickname!= null && !user.getNickname().equals(nickname)) {
-            checkDuplicatedNickname(nickname);
-            user.setNickname(nickname);
+        if(!passwordEncoder.matches(password, user.getPassword())) {
+            throw new BadRequestException(ExceptionCode.CURRENT_PASSWORD_NOT_MATCH);
         }
+        return true;
+    }
 
-        if (phone != null && !user.getPhone().equals(phone)) {
-            checkDuplicatedPhone(phone);
-            user.setPhone(phone);
+    // 핸드폰 번호 수정
+    @Transactional
+    public UserPhoneUpdateResponseDto updatePhoneNumber(String newPhone) {
+        User user = userUtils.getUser();
+
+        if (!user.isPhoneEqual(newPhone)) {
+            checkDuplicatedPhone(newPhone);
+            user.changePhone(newPhone);
         }
 
         userRepository.save(user);
+        return UserPhoneUpdateResponseDto.from(user);
+    }
 
-        return UserUpdateResponseDto.from(user);
+    // 닉네임 수정
+    @Transactional
+    public UserNicknameUpdateResponseDto updateNickname(String newNickname) {
+        User user = userUtils.getUser();
+
+        if (!user.getNickname().equals(newNickname)) {
+            checkDuplicatedNickname(newNickname);
+            user.changeNickname(newNickname);
+        }
+
+        userRepository.save(user);
+        return UserNicknameUpdateResponseDto.from(user);
     }
 
     // 비밀번호 수정
     @Transactional
-    public String changePassword(String currentPassword, String newPassword, String newPasswordConfirm) {
+    public String changePassword(UserPasswordChangeRequestDto requestDto) {
 
         User user = userUtils.getUser();
 
-        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new BadRequestException(ExceptionCode.CURRENT_PASSWORD_NOT_MATCH);
-        }
+        validatePasswordChange(requestDto, user);
 
-        if (!newPassword.equals(newPasswordConfirm)) {
-            throw new BadRequestException(ExceptionCode.PASSWORD_NOT_MATCH);
-        }
-
-        user.setPassword(passwordEncoder.encode(newPassword));
+        user.changePassword(passwordEncoder.encode(requestDto.newPassword()));
         userRepository.save(user);
 
         return "비밀번호가 성공적으로 변경되었습니다.";
@@ -127,7 +143,9 @@ public class UserService {
         User user = userUtils.getUser();
         userRepository.delete(user);
     }
+
 }
+
 
 
 
