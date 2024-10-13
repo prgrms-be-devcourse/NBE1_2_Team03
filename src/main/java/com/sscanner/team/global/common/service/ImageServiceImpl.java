@@ -11,7 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -72,6 +76,7 @@ public class ImageServiceImpl implements ImageService{
             add("HEIC");
             add("jpeg");
             add("png");
+            add("PNG");
             add("heic");
         }};
 
@@ -102,5 +107,32 @@ public class ImageServiceImpl implements ImageService{
         } catch (IOException e) {
             throw new BadRequestException(FILE_UPLOAD_FAIL);
         }
+    }
+
+    /**
+     * 바코드 이미지를 S3에 업로드하는 메서드 추가
+     * @param barcodeBase64 바코드 이미지 (Base64 인코딩된 문자열)
+     * @return S3에 업로드된 바코드 이미지의 URL
+     */
+    @Override
+    public String uploadBarcodeToS3(String barcodeBase64) {
+        // Base64로 인코딩된 바코드 이미지를 디코딩하여 InputStream으로 변환
+        byte[] decodedImg = Base64.getDecoder().decode(barcodeBase64.getBytes(StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream(decodedImg);
+
+        // 랜덤한 파일 이름 생성
+        String fileName = UUID.randomUUID() + ".png";
+
+        // 메타데이터 설정
+        ObjectMetadata objMeta = new ObjectMetadata();
+        objMeta.setContentType("image/png");
+        objMeta.setContentLength(decodedImg.length);
+
+        // S3에 바코드 이미지 업로드
+        s3Client.putObject(
+                new PutObjectRequest(bucket, fileName, inputStream, objMeta)
+                        .withCannedAcl(CannedAccessControlList.PublicRead));
+
+        return baseUrl + "/" + fileName;
     }
 }

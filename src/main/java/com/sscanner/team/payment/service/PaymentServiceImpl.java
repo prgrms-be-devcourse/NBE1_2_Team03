@@ -1,5 +1,7 @@
 package com.sscanner.team.payment.service;
 
+import com.sscanner.team.barcode.entity.Barcode;
+import com.sscanner.team.barcode.service.BarcodeService;
 import com.sscanner.team.payment.entity.PaymentRecord;
 import com.sscanner.team.payment.responsedto.PointPaymentResponseDto;
 import com.sscanner.team.points.service.PointService;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+
+
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
@@ -26,6 +30,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final ProductService productService;
     private final PointService pointService;
     private final PaymentRepository paymentRepository;
+    private final BarcodeService barcodeService;
 
     /**
      * 포인트로 제품을 구매할 수 있습니다.*
@@ -50,7 +55,11 @@ public class PaymentServiceImpl implements PaymentService {
         pointRedisManager.decrementPointInRedis(userId, productPrice);
         pointRedisManager.flagUserForBackup(userId);
 
-        PaymentRequestDto paymentRequestDto = PaymentRequestDto.of(userPoint.getUser(), product, productPrice);
+        Barcode barcode = barcodeService.createAndSaveBarcode(userId, productId);
+
+        PaymentRequestDto paymentRequestDto = PaymentRequestDto.of(
+                userPoint.getUser(), product, productPrice, barcode.getBarcodeUrl()
+        );
         savePayment(paymentRequestDto, userPoint.getUser(), product);
 
         Integer updatedPoint = pointRedisManager.getPointFromRedis(userId);

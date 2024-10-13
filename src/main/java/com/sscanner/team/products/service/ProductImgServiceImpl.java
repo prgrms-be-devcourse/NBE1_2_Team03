@@ -57,4 +57,12 @@ public class ProductImgServiceImpl implements ProductImgService {
 
         return productImgList;
     }
+
+    @Override
+    public String getRepresentativeProductImgUrl(Long productId) {
+        List<ProductImg> productImgs = productImgRepository.findAllByProductId(productId);
+
+        // 대표 이미지가 없다면 첫 번째 이미지를 사용
+        return productImgs.isEmpty() ? null : productImgs.get(0).getProductImgUrl();
+    }
 }
