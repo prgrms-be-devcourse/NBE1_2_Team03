@@ -6,7 +6,7 @@ import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.jwt.JWTUtil;
 import com.sscanner.team.user.entity.Refresh;
 import com.sscanner.team.user.repository.RefreshRepository;
-import com.sscanner.team.user.responseDto.RefreshResponseDto;
+import com.sscanner.team.user.responsedto.RefreshResponseDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
