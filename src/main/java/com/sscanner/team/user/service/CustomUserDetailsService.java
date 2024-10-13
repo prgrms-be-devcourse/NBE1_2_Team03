@@ -4,7 +4,7 @@ import com.sscanner.team.User;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.repository.UserRepository;
-import com.sscanner.team.user.responseDto.UserDetailsImpl;
+import com.sscanner.team.user.responsedto.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

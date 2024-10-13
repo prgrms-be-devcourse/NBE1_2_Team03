@@ -1,4 +1,4 @@
-package com.sscanner.team.user.requestDto;
+package com.sscanner.team.user.requestdto;
 
 import com.sscanner.team.User;
 import jakarta.validation.constraints.NotBlank;

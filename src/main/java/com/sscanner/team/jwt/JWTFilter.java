@@ -1,7 +1,7 @@
 package com.sscanner.team.jwt;
 
 import com.sscanner.team.User;
-import com.sscanner.team.user.responseDto.UserDetailsImpl;
+import com.sscanner.team.user.responsedto.UserDetailsImpl;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

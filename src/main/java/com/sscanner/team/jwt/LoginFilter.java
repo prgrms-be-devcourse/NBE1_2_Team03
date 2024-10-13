@@ -4,7 +4,7 @@ package com.sscanner.team.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sscanner.team.user.entity.Refresh;
 import com.sscanner.team.user.repository.RefreshRepository;
-import com.sscanner.team.user.requestDto.UserLoginRequestDto;
+import com.sscanner.team.user.requestdto.UserLoginRequestDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.Cookie;
