@@ -3,11 +3,13 @@ package com.sscanner.team.trashcan.service;
 import com.sscanner.team.trashcan.entity.Trashcan;
 import com.sscanner.team.trashcan.entity.TrashcanDocument;
 import com.sscanner.team.trashcan.repository.TrashcanDocumentRepository;
+import com.sscanner.team.trashcan.responseDto.TrashcanSearchResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -19,8 +21,12 @@ public class TrashcanDocumentService {
         return documentRepository.save(document);
     }
 
-    public List<TrashcanDocument> findByRoadNameAddress(String roadNameAddress) {
-        return documentRepository.findByRoadNameAddress(roadNameAddress);
+    public List<TrashcanSearchResponseDto> findByRoadNameAddress(String roadNameAddress) {
+
+        return documentRepository.findByRoadNameAddressContaining(roadNameAddress)
+                .stream()
+                .map(TrashcanSearchResponseDto::from)  // 팩토리 메서드를 사용하여 변환
+                .collect(Collectors.toList());
     }
 
     public void saveTrashcanDocuments(List<Trashcan> trashcans) {
@@ -35,7 +41,7 @@ public class TrashcanDocumentService {
         for (Trashcan trashcan : trashcans) {
 
             TrashcanDocument document = TrashcanDocument.builder()
-                    .id(trashcan.getId().toString())
+                    .id(trashcan.getId())
                     .roadNameAddress(trashcan.getRoadNameAddress())
                     .longitude(trashcan.getLongitude())
                     .latitude(trashcan.getLatitude())

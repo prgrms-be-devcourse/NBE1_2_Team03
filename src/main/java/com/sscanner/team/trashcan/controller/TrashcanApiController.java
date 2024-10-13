@@ -5,7 +5,9 @@ import com.sscanner.team.global.common.response.ApiResponse;
 import com.sscanner.team.trashcan.requestDto.RegisterTrashcanRequestDto;
 import com.sscanner.team.trashcan.requestDto.UpdateTrashcanRequestDto;
 import com.sscanner.team.trashcan.responseDto.TrashcanResponseDto;
+import com.sscanner.team.trashcan.responseDto.TrashcanSearchResponseDto;
 import com.sscanner.team.trashcan.responseDto.TrashcanWithImgResponseDto;
+import com.sscanner.team.trashcan.service.TrashcanDocumentService;
 import com.sscanner.team.trashcan.service.TrashcanImgService;
 import com.sscanner.team.trashcan.service.TrashcanService;
 import jakarta.validation.Valid;
@@ -27,6 +29,7 @@ import java.util.List;
 public class TrashcanApiController {
 
     private final TrashcanService trashcanService;
+    private final TrashcanDocumentService trashcanDocumentService;
 
     @PostMapping()
     public ApiResponse<TrashcanWithImgResponseDto> registerTrashcan(@RequestPart(value = "data") @Valid RegisterTrashcanRequestDto requestDto,
@@ -43,6 +46,14 @@ public class TrashcanApiController {
         TrashcanWithImgResponseDto responseDto = trashcanService.getTrashcanInfo(trashcanId);
 
         return ApiResponse.ok(200, responseDto, "쓰레기통 조회 성공");
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<List<TrashcanSearchResponseDto>> searchTrashcans(@RequestParam String word){
+
+        List<TrashcanSearchResponseDto> responseDtos = trashcanDocumentService.findByRoadNameAddress(word);
+
+        return ApiResponse.ok(200, responseDtos, "쓰레기통 검색 성공");
     }
 
     @GetMapping("/getNearByTrashcans")

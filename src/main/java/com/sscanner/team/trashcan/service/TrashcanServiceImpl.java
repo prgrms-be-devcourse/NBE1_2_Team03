@@ -81,7 +81,7 @@ public class TrashcanServiceImpl implements TrashcanService {
                 .orElseThrow(() -> new BadRequestException(NOT_FOUND_NEARBY_TRASHCANS));
     }
 
-    private static List<TrashcanResponseDto> convertToTrashcanResponses(List<Trashcan> trashcans) {
+    private List<TrashcanResponseDto> convertToTrashcanResponses(List<Trashcan> trashcans) {
         List<TrashcanResponseDto> trashcanResponseDtos = new ArrayList<>();
         for (Trashcan trashcan : trashcans) {
             trashcanResponseDtos.add(TrashcanResponseDto.from(trashcan));
