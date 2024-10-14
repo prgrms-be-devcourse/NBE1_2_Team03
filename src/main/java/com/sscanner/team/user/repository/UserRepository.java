@@ -1,6 +1,6 @@
 package com.sscanner.team.user.repository;
 
-import com.sscanner.team.User;
+import com.sscanner.team.user.entity.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

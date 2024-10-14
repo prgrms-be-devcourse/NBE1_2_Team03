@@ -1,5 +1,7 @@
 package com.sscanner.team.points.requestdto;
 
+import com.sscanner.team.user.entity.User;
+import com.sscanner.team.UserPoint;
 import com.sscanner.team.User;
 import com.sscanner.team.points.entity.UserPoint;
 
