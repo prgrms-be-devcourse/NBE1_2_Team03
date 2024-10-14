@@ -1,4 +1,4 @@
-package com.sscanner.team;
+package com.sscanner.team.user.entity;
 
 import com.sscanner.team.global.common.BaseEntity;
 import jakarta.persistence.*;

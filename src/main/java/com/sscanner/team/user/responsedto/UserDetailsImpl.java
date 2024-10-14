@@ -1,6 +1,6 @@
 package com.sscanner.team.user.responsedto;
 
-import com.sscanner.team.User;
+import com.sscanner.team.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

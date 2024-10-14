@@ -2,7 +2,7 @@ package com.sscanner.team.points.service;
 
 import com.sscanner.team.PaymentRecord;
 import com.sscanner.team.Product;
-import com.sscanner.team.User;
+import com.sscanner.team.user.entity.User;
 import com.sscanner.team.UserPoint;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
