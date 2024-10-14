@@ -34,6 +34,12 @@ jobs:
       COOLSMS_API_KEY: ${{ secrets.COOLSMS_API_KEY}}
       COOLSMS_API_SECRET: ${{ secrets.COOLSMS_API_SECRET }}
       COOLSMS_PHONE_NUMBER: ${{ secrets.COOLSMS_PHONE_NUMBER }}
+      #ELK
+      STACK_VERSION: ${{ secrets.STACK_VERSION }}
+      ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+      ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+      KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
+      CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
 
     steps:
       - name: Github Repository 파일 불러오기
