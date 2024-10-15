@@ -64,19 +64,6 @@ public class UserController {
 
     //회원 탈퇴
     @DeleteMapping("/delete")
-    public ApiResponse<?> deleteUSer(){
-        userService.deleteUser();
-        return ApiResponse.ok(200, "회원 탈퇴 성공");
-    }
-    //비밀번호 수정
-    @PatchMapping("/change-password")
-    public ApiResponse<String> changePassword(@RequestBody UserPasswordChangeRequestDto requestDto) {
-        String message = userService.changePassword(requestDto);
-        return ApiResponse.ok(message, "비밀번호 수정 성공");
-    }
-
-    //회원 탈퇴
-    @DeleteMapping("/delete")
     public ApiResponse<Void> deleteUSer(){
         userService.deleteUser();
         return ApiResponse.ok(200, null,"회원 탈퇴 성공");
