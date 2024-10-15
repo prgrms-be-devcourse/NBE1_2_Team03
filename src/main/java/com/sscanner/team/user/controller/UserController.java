@@ -64,9 +64,9 @@ public class UserController {
 
     //회원 탈퇴
     @DeleteMapping("/delete")
-    public ApiResponse<Void> deleteUSer(){
+    public ApiResponse<?> deleteUSer(){
         userService.deleteUser();
-        return ApiResponse.ok(200, null,"회원 탈퇴 성공");
+        return ApiResponse.ok(200, "회원 탈퇴 성공");
     }
 }
 
