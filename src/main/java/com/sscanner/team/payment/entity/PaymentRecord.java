@@ -1,10 +1,9 @@
 package com.sscanner.team.payment.entity;
 
-import com.sscanner.team.User;
+
 import com.sscanner.team.global.common.BaseEntity;
 import com.sscanner.team.user.entity.User;
 import com.sscanner.team.products.entity.Product;
-import com.sscanner.team.user.entity.User;
 import com.sscanner.team.util.UUIDConverter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

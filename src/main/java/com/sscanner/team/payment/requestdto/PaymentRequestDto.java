@@ -1,12 +1,9 @@
 package com.sscanner.team.payment.requestdto;
 
-import com.sscanner.team.PaymentRecord;
-import com.sscanner.team.Product;
+
 import com.sscanner.team.user.entity.User;
 import com.sscanner.team.payment.entity.PaymentRecord;
 import com.sscanner.team.products.entity.Product;
-import com.sscanner.team.User;
-import com.sscanner.team.user.entity.User;
 
 import java.util.UUID;
 

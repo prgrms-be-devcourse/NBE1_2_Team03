@@ -6,7 +6,7 @@ import com.sscanner.team.payment.entity.PaymentRecord;
 import com.sscanner.team.payment.responsedto.PointPaymentResponseDto;
 import com.sscanner.team.points.service.PointService;
 import com.sscanner.team.products.entity.Product;
-import com.sscanner.team.User;
+import com.sscanner.team.user.entity.User;
 import com.sscanner.team.points.entity.UserPoint;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
