@@ -7,6 +7,7 @@ import com.sscanner.team.global.exception.DuplicateException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.repository.UserRepository;
 import com.sscanner.team.user.requestdto.UserJoinRequestDto;
+import com.sscanner.team.user.requestdto.UserNicknameUpdateRequestDto;
 import com.sscanner.team.user.requestdto.UserPasswordChangeRequestDto;
 import com.sscanner.team.user.responsedto.*;
 import jakarta.transaction.Transactional;
@@ -110,15 +111,15 @@ public class UserService {
 
     // 닉네임 수정
     @Transactional
-    public UserNicknameUpdateResponseDto updateNickname(String newNickname) {
+    public UserNicknameUpdateResponseDto updateNickname(UserNicknameUpdateRequestDto requestDto) {
         User user = userUtils.getUser();
 
-        if (!user.getNickname().equals(newNickname)) {
-            checkDuplicatedNickname(newNickname);
-            user.changeNickname(newNickname);
+        if (!user.getNickname().equals(requestDto.newNickname())) {
+            checkDuplicatedNickname(requestDto.newNickname());
+            User updatedUser = requestDto.change(user);
+            userRepository.save(updatedUser);
+            return UserNicknameUpdateResponseDto.from(updatedUser);
         }
-
-        userRepository.save(user);
         return UserNicknameUpdateResponseDto.from(user);
     }
 
