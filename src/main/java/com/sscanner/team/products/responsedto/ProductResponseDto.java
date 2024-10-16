@@ -7,7 +7,7 @@ public record ProductResponseDto(
     String productName,
     Integer price
 ) {
-    public static ProductResponseDto of(Product product) {
+    public static ProductResponseDto from(Product product) {
         return new ProductResponseDto(
                 product.getId(),
                 product.getName(),
@@ -17,9 +17,9 @@ public record ProductResponseDto(
 
     public Product toEntity() {
         return Product.builder()
-                .id(this.productId)  // 엔티티의 id와 매핑
-                .name(this.productName)
-                .price(this.price)
+                .id(productId)  // 엔티티의 id와 매핑
+                .name(productName)
+                .price(price)
                 .build();
     }
 }

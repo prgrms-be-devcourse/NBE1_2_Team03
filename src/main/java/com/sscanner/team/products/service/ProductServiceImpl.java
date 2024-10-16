@@ -56,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
                 .map(ProductImgResponseDto::url)
                 .toList();
 
-        return ProductWithImgResponseDto.of(product, imgUrls);
+        return ProductWithImgResponseDto.from(product, imgUrls);
     }
 
     private Map<String, Object> createResponse(List<ProductWithImgResponseDto> productWithImgDtos, Page<Product> products) {
@@ -72,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDto findById(Long productId) {
         return productRepository.findById(productId)
-                .map(ProductResponseDto::of)
+                .map(ProductResponseDto::from)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_PRODUCT_ID));
     }
 

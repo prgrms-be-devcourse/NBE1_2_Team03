@@ -10,7 +10,7 @@ public record ProductWithImgResponseDto(
         Integer price,
         List<String> imgUrls
 ) {
-    public static ProductWithImgResponseDto of(Product product, List<String> imgUrls) {
+    public static ProductWithImgResponseDto from(Product product, List<String> imgUrls) {
         return new ProductWithImgResponseDto(
                 product.getId(),
                 product.getName(),

@@ -20,8 +20,8 @@ public record ProductImgResponseDto (
 
     public ProductImg toEntity() {
         return ProductImg.builder()
-                .productId(this.productId)
-                .url(this.url)
+                .productId(productId)
+                .url(url)
                 .build();
     }
 }
