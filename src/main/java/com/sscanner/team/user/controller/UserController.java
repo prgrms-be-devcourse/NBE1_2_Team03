@@ -42,10 +42,8 @@ public class UserController {
     // 비밀번호 확인 (폰번호 수정 전 현재 비밀번호 확인 후 접근 가능)
     @PostMapping("/confirm-password")
     public ApiResponse <String> confirmPassword(@RequestBody String password) {
-        boolean isConfirmed = userService.confirmPassword(password);
-        if(isConfirmed){
+        userService.confirmPassword(password);userService.confirmPassword(password);
             return ApiResponse.ok(200,null,"비밀번호 확인 성공");
-        }else throw new BadRequestException(ExceptionCode.CURRENT_PASSWORD_NOT_MATCH);
     }
 
     // 핸드폰 번호 수정 요청
