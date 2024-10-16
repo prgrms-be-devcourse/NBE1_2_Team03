@@ -43,7 +43,7 @@ public class PaymentServiceImpl implements PaymentService {
         String userId = pointPaymentRequestDto.userId();
         Long productId = pointPaymentRequestDto.productId();
 
-        Product product = productService.getProductEntityById(productId);
+        Product product = productService.findById(productId).toEntity();
         UserPoint userPoint = pointService.findUserPointByUserId(userId);
         Integer productPrice = product.getPrice();
 
