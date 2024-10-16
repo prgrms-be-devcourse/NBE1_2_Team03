@@ -6,12 +6,13 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-
+@Builder(toBuilder = true)
 @Getter
 @Entity
 @SQLDelete(sql = "UPDATE user SET deleted_at = NOW() WHERE user_id = ?")
 @Where(clause = "deleted_at is NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "USER")
 public class User extends BaseEntity {
 

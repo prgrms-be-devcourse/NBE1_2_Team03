@@ -1,8 +1,6 @@
 package com.sscanner.team.user.controller;
 
 import com.sscanner.team.global.common.response.ApiResponse;
-import com.sscanner.team.global.exception.BadRequestException;
-import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.requestdto.*;
 import com.sscanner.team.user.responsedto.*;
 import com.sscanner.team.user.service.UserService;
@@ -34,7 +32,7 @@ public class UserController {
     // 닉네임 수정
     @PatchMapping("/change-nickname")
     public ApiResponse <UserNicknameUpdateResponseDto> updateNickname(@RequestBody UserNicknameUpdateRequestDto requestDto) {
-        UserNicknameUpdateResponseDto responseDto = userService.updateNickname(requestDto.newNickname());
+        UserNicknameUpdateResponseDto responseDto = userService.updateNickname(requestDto);
         return ApiResponse.ok(200, responseDto, "닉네임 수정 성공");
 
     }
