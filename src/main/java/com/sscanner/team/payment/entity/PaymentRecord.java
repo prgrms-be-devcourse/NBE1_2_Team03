@@ -14,13 +14,13 @@ import java.util.UUID;
 
 @Getter
 @Entity
-@Table(name = "Payment_record")
+@Table(name = "payment_record")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PaymentRecord extends BaseEntity {
     @Id
     @Convert(converter = UUIDConverter.class)
     @Column(name = "payment_record_id", nullable = false, length = 16)
-    private UUID paymentRecordId;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -37,8 +37,8 @@ public class PaymentRecord extends BaseEntity {
     private String barcodeUrl;
 
     @Builder
-    public PaymentRecord(UUID paymentRecordId, User user, Product product, Integer payment, String barcodeUrl) {
-        this.paymentRecordId = paymentRecordId;
+    public PaymentRecord(UUID id, User user, Product product, Integer payment, String barcodeUrl) {
+        this.id = id;
         this.user = user;
         this.product = product;
         this.payment = payment;
