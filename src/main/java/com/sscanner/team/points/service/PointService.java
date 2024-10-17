@@ -13,6 +13,8 @@ public interface PointService {
     Integer fetchCachedPoint(String userId);
     PointResponseDto findByUserId(String userId);
     void removeBackupFlag(String userId);
+    void markUserForBackup(String userId);
+    void decrementPoint(String userId, int productPrice);
     void updateUserPoint(PointUpdateRequestDto pointUpdateRequestDto);
     Set<String> getFlaggedUsersForBackup();
     void resetDailyPointsInCache();

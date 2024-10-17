@@ -95,12 +95,19 @@ public class PointServiceImpl implements PointService {
         pointRedisService.incrementDailyPoint(userId, point);
     }
 
-    private void markUserForBackup(String userId) {
+    @Override
+    public void removeBackupFlag(String userId) {
+        pointRedisService.removeBackupFlag(userId);
+    }
+
+    @Override
+    public void markUserForBackup(String userId) {
         pointRedisService.flagUserForBackup(userId);
     }
 
-    public void removeBackupFlag(String userId) {
-        pointRedisService.removeBackupFlag(userId);
+    @Override
+    public void decrementPoint(String userId, int point) {
+        pointRedisService.decrementPoint(userId, point);
     }
 
     @Transactional
