@@ -1,6 +1,6 @@
 package com.sscanner.team.board.requestdto;
 
-import com.sscanner.team.User;
+import com.sscanner.team.user.entity.User;
 import com.sscanner.team.board.entity.Board;
 import com.sscanner.team.board.type.BoardCategory;
 import com.sscanner.team.trashcan.type.TrashCategory;

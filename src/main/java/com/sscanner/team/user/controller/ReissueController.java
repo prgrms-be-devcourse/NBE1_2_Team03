@@ -1,14 +1,12 @@
 package com.sscanner.team.user.controller;
 
 import com.sscanner.team.global.common.response.ApiResponse;
-import com.sscanner.team.user.responseDto.RefreshResponseDto;
+import com.sscanner.team.user.responsedto.RefreshResponseDto;
 import com.sscanner.team.user.service.ReissueService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

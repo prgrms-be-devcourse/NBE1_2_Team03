@@ -38,10 +38,11 @@ public class JWTUtil {
         return parseToken(token).get("authority", String.class);    }
 
 
-public void isExpired(String token) {
-    Claims claims = parseToken(token);
-    if (claims.getExpiration().before(new Date())) {
-        throw new ExpiredJwtException(null, claims, "토큰 만료됨");
+    public void isExpired(String token) {
+        Claims claims = parseToken(token);
+
+        if (claims.getExpiration().before(new Date())) {
+            throw new ExpiredJwtException(null, claims, "토큰 만료됨");
     }
 }
 

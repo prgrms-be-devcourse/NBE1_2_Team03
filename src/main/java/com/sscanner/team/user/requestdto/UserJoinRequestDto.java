@@ -1,6 +1,6 @@
-package com.sscanner.team.user.requestDto;
+package com.sscanner.team.user.requestdto;
 
-import com.sscanner.team.User;
+import com.sscanner.team.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
 
 public record UserJoinRequestDto(
@@ -29,7 +29,7 @@ public record UserJoinRequestDto(
                 .password(encodedPassword)
                 .nickname(nickname)
                 .phone(phone)
-                .authority("USER")
+                .authority("ROLE_USER")
                 .build();
     }
 

@@ -1,4 +1,4 @@
-package com.sscanner.team.user.responseDto;
+package com.sscanner.team.user.responsedto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ public class RefreshResponseDto {
     private String accessToken;
     private String refreshToken;
 
-    public static RefreshResponseDto from(String accessToken, String refreshToken) {
+    public static RefreshResponseDto of(String accessToken, String refreshToken) {
         return new RefreshResponseDto(accessToken, refreshToken);
     }
 }

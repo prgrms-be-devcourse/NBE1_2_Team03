@@ -1,6 +1,6 @@
 package com.sscanner.team.comment.requestdto;
 
-import com.sscanner.team.User;
+import com.sscanner.team.user.entity.User;
 import com.sscanner.team.comment.entity.Comment;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
