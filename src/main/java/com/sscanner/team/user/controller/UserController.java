@@ -1,6 +1,8 @@
 package com.sscanner.team.user.controller;
 
 import com.sscanner.team.global.common.response.ApiResponse;
+import com.sscanner.team.global.exception.BadRequestException;
+import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.requestdto.*;
 import com.sscanner.team.user.responsedto.*;
 import com.sscanner.team.user.service.UserService;
@@ -32,7 +34,7 @@ public class UserController {
     // 닉네임 수정
     @PatchMapping("/change-nickname")
     public ApiResponse <UserNicknameUpdateResponseDto> updateNickname(@RequestBody UserNicknameUpdateRequestDto requestDto) {
-        UserNicknameUpdateResponseDto responseDto = userService.updateNickname(requestDto);
+        UserNicknameUpdateResponseDto responseDto = userService.updateNickname(requestDto.newNickname());
         return ApiResponse.ok(200, responseDto, "닉네임 수정 성공");
 
     }
@@ -40,8 +42,10 @@ public class UserController {
     // 비밀번호 확인 (폰번호 수정 전 현재 비밀번호 확인 후 접근 가능)
     @PostMapping("/confirm-password")
     public ApiResponse <String> confirmPassword(@RequestBody String password) {
-        userService.confirmPassword(password);userService.confirmPassword(password);
+        boolean isConfirmed = userService.confirmPassword(password);
+        if(isConfirmed){
             return ApiResponse.ok(200,null,"비밀번호 확인 성공");
+        }else throw new BadRequestException(ExceptionCode.CURRENT_PASSWORD_NOT_MATCH);
     }
 
     // 핸드폰 번호 수정 요청

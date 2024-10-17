@@ -104,21 +104,17 @@ public class UserService {
             checkDuplicatedPhone(newPhone);
             user.changePhone(newPhone);
         }
-
-        userRepository.save(user);
         return UserPhoneUpdateResponseDto.from(user);
     }
 
     // 닉네임 수정
     @Transactional
-    public UserNicknameUpdateResponseDto updateNickname(UserNicknameUpdateRequestDto requestDto) {
+    public UserNicknameUpdateResponseDto updateNickname(String  newNickname) {
         User user = userUtils.getUser();
 
-        if (!user.getNickname().equals(requestDto.newNickname())) {
-            checkDuplicatedNickname(requestDto.newNickname());
-            User updatedUser = requestDto.change(user);
-            userRepository.save(updatedUser);
-            return UserNicknameUpdateResponseDto.from(updatedUser);
+        if (!user.isNicknameEqual(newNickname)) {
+            checkDuplicatedNickname(newNickname);
+            user.changeNickname(newNickname);
         }
         return UserNicknameUpdateResponseDto.from(user);
     }
