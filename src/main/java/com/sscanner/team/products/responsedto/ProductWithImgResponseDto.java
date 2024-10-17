@@ -1,7 +1,6 @@
 package com.sscanner.team.products.responsedto;
 
 import com.sscanner.team.products.entity.Product;
-import com.sscanner.team.products.entity.ProductImg;
 
 import java.util.List;
 
@@ -11,14 +10,10 @@ public record ProductWithImgResponseDto(
         Integer price,
         List<String> imgUrls
 ) {
-    public static ProductWithImgResponseDto of(Product product, List<ProductImg> productImgs) {
-        List<String> imgUrls = productImgs.stream()
-                .map(ProductImg::getProductImgUrl)
-                .toList();
-
+    public static ProductWithImgResponseDto from(Product product, List<String> imgUrls) {
         return new ProductWithImgResponseDto(
                 product.getId(),
-                product.getProductName(),
+                product.getName(),
                 product.getPrice(),
                 imgUrls
         );

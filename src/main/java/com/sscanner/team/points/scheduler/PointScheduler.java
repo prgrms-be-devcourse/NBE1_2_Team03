@@ -1,21 +1,23 @@
 package com.sscanner.team.points.scheduler;
 
 import com.sscanner.team.points.entity.UserPoint;
+import com.sscanner.team.points.requestdto.PointUpdateRequestDto;
+import com.sscanner.team.points.responsedto.PointResponseDto;
 import com.sscanner.team.points.service.PointService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.sscanner.team.points.common.PointConstants.*;
 
@@ -25,8 +27,9 @@ import static com.sscanner.team.points.common.PointConstants.*;
 public class PointScheduler {
 
     private final PointService pointService;
-    private final RedisTemplate<String, Integer> redisTemplate;
     private final ThreadPoolTaskExecutor taskExecutor;
+    private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(5); // 비동기 스케줄링 서비스
+    private final ReentrantLock lock = new ReentrantLock();  // 동시성 제어를 위한 Lock
 
     @PostConstruct
     public void init() {
@@ -37,75 +40,112 @@ public class PointScheduler {
         taskExecutor.initialize();
     }
 
-    @Scheduled(fixedRate = 300000, initialDelay = 300000)
+    @Scheduled(cron = "0 0 3 * * ?")
     public void backupPointsToMySQL() {
         Set<String> flaggedUsers = pointService.getFlaggedUsersForBackup();
-        log.error(flaggedUsers.toString());
+        runBackupAsyncForUsers(flaggedUsers);
+    }
 
+    private void runBackupAsyncForUsers(Set<String> flaggedUsers) {
         for (String flaggedUserId : flaggedUsers) {
             String userId = flaggedUserId.replace(BACKUP_FLAG_PREFIX, "");
-            CompletableFuture.runAsync(() -> processUserBackup(userId), taskExecutor)
-                    .exceptionally(ex -> null);
+            CompletableFuture.runAsync(() -> processPointBackup(userId), taskExecutor)
+                    .exceptionally(ex -> {
+                        log.error("Backup failed for user {}", userId, ex);
+                        return null;
+                    });
         }
     }
 
-    private void processUserBackup(String userId) {
-        retryOnFailure(() -> {
-            Integer currentPoint = redisTemplate.opsForValue().get(POINT_PREFIX + userId);
-            if (currentPoint != null) {
-                UserPoint userPoint = pointService.findUserPointByUserId(userId);
-                pointService.updateUserPoints(userPoint, currentPoint);
-            }
-            // 백업이 완료된 후, 플래그를 삭제
-            redisTemplate.delete(BACKUP_FLAG_PREFIX + userId);
-        });
+    private void processPointBackup(String userId) {
+        retryAsync(() -> backupUserPoints(userId), RETRY_MAX_ATTEMPTS, RETRY_DELAY);
     }
 
-    private void retryOnFailure(Runnable task) {
-        int attempts = 0;
-
-        while (attempts < RETRY_MAX_ATTEMPTS) {
+    private void retryAsync(Runnable task, int attempts, long delay) {
+        CompletableFuture.runAsync(() -> {
             try {
-                task.run();
-                return;
+                task.run();  // 시도
             } catch (Exception e) {
-                attempts++;
-                if (attempts >= RETRY_MAX_ATTEMPTS) {
-                    break;
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException interruptedException) {
-                    Thread.currentThread().interrupt();
-                }
+                handleRetryFailure(task, attempts, delay, e);
             }
+        }, taskExecutor);
+    }
+
+    private void handleRetryFailure(Runnable task, int attempts, long delay, Exception e) {
+        if (attempts > 0) {
+            log.error("Attempt failed, retrying... Attempts left: {}, delay: {}ms", attempts, delay, e);
+            scheduledExecutorService.schedule(() -> retryAsync(task, attempts - 1, delay * 2), delay, TimeUnit.MILLISECONDS);
+        } else {
+            log.error("Max retry attempts reached. Task failed.");
         }
+    }
+
+    private void backupUserPoints(String userId) {
+        // Lock 범위를 최소화하여, 갱신 작업과 플래그 제거에만 적용
+        Integer currentCachedPoint = fetchCachedPoint(userId);
+        if (currentCachedPoint != null) {
+            updateUserPointsWithLock(userId, currentCachedPoint);
+        }
+        removeBackupFlagWithLock(userId);
+    }
+
+    private Integer fetchCachedPoint(String userId) {
+        return pointService.fetchCachedPoint(userId);
+    }
+
+    private void updateUserPointsWithLock(String userId, Integer currentCachedPoint) {
+        lock.lock();
+        try {
+            PointUpdateRequestDto updateRequestDto = createPointUpdateRequestDto(userId, currentCachedPoint);
+            updateUserPoint(updateRequestDto);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private PointUpdateRequestDto createPointUpdateRequestDto(String userId, Integer currentCachedPoint) {
+        PointResponseDto pointResponseDto = pointService.findByUserId(userId);
+        UserPoint userPoint = pointResponseDto.toEntity();
+
+        return PointUpdateRequestDto.of(userPoint.getId(), userPoint.getUser(), currentCachedPoint);
+    }
+
+    private void updateUserPoint(PointUpdateRequestDto updateRequestDto) {
+        pointService.updateUserPoint(updateRequestDto);
+    }
+
+    private void removeBackupFlagWithLock(String userId) {
+        lock.lock();
+        try {
+            removeBackupFlag(userId);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private void removeBackupFlag(String userId) {
+        pointService.removeBackupFlag(userId);
     }
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void resetDailyPointLimit() {
-        ScanOptions scanOptions = ScanOptions.scanOptions().match(DAILY_POINT_PREFIX + "*").build();
-
-        try (Cursor<String> cursor = redisTemplate.scan(scanOptions)) {
-            while (cursor.hasNext()) {
-                String key = cursor.next();
-                redisTemplate.delete(key);
-            }
-        } catch (Exception e) {
-            log.error("Error during Redis SCAN operation", e);
-        }
+        pointService.resetDailyPointsInCache();
     }
 
     @PreDestroy
     public void shutdown() {
         taskExecutor.shutdown();
         try {
-            if (!taskExecutor.getThreadPoolExecutor().awaitTermination(60, TimeUnit.SECONDS)) {
+            if (!hasTaskExecutorTerminated(taskExecutor)) {
                 taskExecutor.getThreadPoolExecutor().shutdownNow();
             }
         } catch (InterruptedException ex) {
             taskExecutor.getThreadPoolExecutor().shutdownNow();
             Thread.currentThread().interrupt();
         }
+    }
+
+    private boolean hasTaskExecutorTerminated(ThreadPoolTaskExecutor taskExecutor) throws InterruptedException {
+        return taskExecutor.getThreadPoolExecutor().awaitTermination(TIME_OUT, TimeUnit.SECONDS);
     }
 }

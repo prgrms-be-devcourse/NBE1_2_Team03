@@ -1,6 +1,5 @@
 package com.sscanner.team.comment.responsedto;
 
-import com.sscanner.team.user.entity.User;
 import com.sscanner.team.comment.entity.Comment;
 
 public record CommentResponseDTO(

@@ -1,12 +1,9 @@
 package com.sscanner.team.jwt;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sscanner.team.user.entity.Refresh;
 import com.sscanner.team.user.repository.RefreshRepository;
-import com.sscanner.team.user.requestdto.UserLoginRequestDto;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,10 +16,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.util.StreamUtils;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Date;
 
@@ -37,20 +30,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)throws AuthenticationException {
 
-        UserLoginRequestDto loginDto;
-
-        try{
-            ObjectMapper objectMapper = new ObjectMapper();
-            ServletInputStream inputStream = request.getInputStream();
-            String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
-            loginDto = objectMapper.readValue(messageBody, UserLoginRequestDto.class);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        String email = loginDto.email();
-        String password = loginDto.password();
+        String email = obtainUsername(request);
+        String password = obtainPassword(request);
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
 

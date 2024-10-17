@@ -1,6 +1,6 @@
-package com.sscanner.team.user.responsedto;
+package com.sscanner.team.user.responseDto;
 
-import com.sscanner.team.user.entity.User;
+import com.sscanner.team.User;
 
 public record UserJoinResponseDto(
         String userId,
