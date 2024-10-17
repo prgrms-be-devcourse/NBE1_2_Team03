@@ -4,13 +4,14 @@ import com.sscanner.team.barcode.entity.Barcode;
 import com.sscanner.team.barcode.service.BarcodeService;
 import com.sscanner.team.payment.entity.PaymentRecord;
 import com.sscanner.team.payment.responsedto.PointPaymentResponseDto;
+import com.sscanner.team.points.redis.PointRedisService;
+import com.sscanner.team.points.responsedto.PointResponseDto;
 import com.sscanner.team.points.service.PointService;
 import com.sscanner.team.products.entity.Product;
 import com.sscanner.team.User;
 import com.sscanner.team.points.entity.UserPoint;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
-import com.sscanner.team.points.redis.PointRedisManager;
 import com.sscanner.team.payment.repository.PaymentRepository;
 import com.sscanner.team.payment.requestdto.PaymentRequestDto;
 import com.sscanner.team.payment.requestdto.PointPaymentRequestDto;
@@ -26,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
-    private final PointRedisManager pointRedisManager;
+    private final PointRedisService pointRedisService;
     private final ProductService productService;
     private final PointService pointService;
     private final PaymentRepository paymentRepository;
@@ -44,16 +45,17 @@ public class PaymentServiceImpl implements PaymentService {
         Long productId = pointPaymentRequestDto.productId();
 
         Product product = productService.findById(productId).toEntity();
-        UserPoint userPoint = pointService.findUserPointByUserId(userId);
+        PointResponseDto pointResponseDto = pointService.findByUserId(userId);
+        UserPoint userPoint = pointResponseDto.toEntity();
         Integer productPrice = product.getPrice();
 
         // Redis에서 총 포인트 가져오기
-        Integer currentPoint = pointRedisManager.getPointFromRedis(userId);
+        Integer currentPoint = pointRedisService.getPoint(userId);
 
         // Redis에서 포인트 차감
         validateEnoughPoints(currentPoint, productPrice);
-        pointRedisManager.decrementPointInRedis(userId, productPrice);
-        pointRedisManager.flagUserForBackup(userId);
+        pointRedisService.decrementPoint(userId, productPrice);
+        pointRedisService.flagUserForBackup(userId);
 
         Barcode barcode = barcodeService.createAndSaveBarcode(userId, productId);
 
@@ -62,7 +64,7 @@ public class PaymentServiceImpl implements PaymentService {
         );
         savePayment(paymentRequestDto, userPoint.getUser(), product);
 
-        Integer updatedPoint = pointRedisManager.getPointFromRedis(userId);
+        Integer updatedPoint = pointRedisService.getPoint(userId);
         return PointPaymentResponseDto.of(userId, updatedPoint);
     }
 
