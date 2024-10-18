@@ -30,16 +30,16 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public PointPaymentResponseDto payPoint(PointPaymentRequestDto pointPaymentRequestDto) {
+    public PointPaymentResponseDto processPointPayment(PointPaymentRequestDto pointPaymentRequestDto) {
         String userId = pointPaymentRequestDto.userId();
         Long productId = pointPaymentRequestDto.productId();
 
-        Product product = productService.findById(productId).toEntity();
+        Product product = productService.findById(productId);
         Integer productPrice = product.getPrice();
 
         processPointDeduction(userId, productPrice);
 
-        UserPoint userPoint = pointService.findByUserId(userId).toEntity();
+        UserPoint userPoint = pointService.findByUserId(userId);
 
         Barcode barcode = barcodeService.createAndSaveBarcode(userId, productId);
 
@@ -48,16 +48,6 @@ public class PaymentServiceImpl implements PaymentService {
 
         Integer updatedPoint = pointService.fetchCachedPoint(userId);
         return PointPaymentResponseDto.of(userId, updatedPoint);
-    }
-
-    private PaymentRecord createPaymentRecord(UserPoint userPoint, Product product, Integer productPrice, Barcode barcode) {
-        return PaymentRecord.builder()
-                .id(UUID.randomUUID())
-                .user(userPoint.getUser())
-                .product(product)
-                .payment(productPrice)
-                .barcodeUrl(barcode.getBarcodeUrl())
-                .build();
     }
 
     private void processPointDeduction(String userId, Integer productPrice) {
@@ -72,5 +62,15 @@ public class PaymentServiceImpl implements PaymentService {
         if (currentPoint == null || currentPoint < productPrice) {
             throw new BadRequestException(ExceptionCode.NOT_ENOUGH_POINTS);
         }
+    }
+
+    private PaymentRecord createPaymentRecord(UserPoint userPoint, Product product, Integer productPrice, Barcode barcode) {
+        return PaymentRecord.builder()
+                .id(UUID.randomUUID())
+                .user(userPoint.getUser())
+                .product(product)
+                .payment(productPrice)
+                .barcodeUrl(barcode.getBarcodeUrl())
+                .build();
     }
 }
