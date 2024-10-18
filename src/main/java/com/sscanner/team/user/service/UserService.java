@@ -7,10 +7,11 @@ import com.sscanner.team.global.exception.DuplicateException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.repository.UserRepository;
 import com.sscanner.team.user.requestdto.UserJoinRequestDto;
-import com.sscanner.team.user.requestdto.UserNicknameUpdateRequestDto;
 import com.sscanner.team.user.requestdto.UserPasswordChangeRequestDto;
 import com.sscanner.team.user.responsedto.*;
 import jakarta.transaction.Transactional;
+import com.sscanner.team.user.requestdto.SmsVerifyRequestDto;
+import com.sscanner.team.user.responsedto.UserJoinResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final SmsService smsService;
     private final UserUtils userUtils;
 
     // 이메일 중복 체크
@@ -67,6 +69,11 @@ public class UserService {
         checkDuplicatedEmail(req.email());
         checkDuplicatedNickname(req.nickname());
         checkDuplicatedPhone(req.phone());
+
+        if (!smsService.verifyCode(new SmsVerifyRequestDto(req.phone(), req.smsCode()))) {
+            throw new IllegalArgumentException("핸드폰 인증에 실패하였습니다."); // 인증 실패 시 예외 던짐
+        }
+
 
         confirmPassword(req.password(), req.passwordCheck());
 
