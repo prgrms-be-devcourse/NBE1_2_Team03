@@ -1,5 +1,6 @@
 package com.sscanner.team.trashcan.service;
 
+import com.sscanner.team.global.configure.aop.TimeTrace;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.utils.GeoUtils;
 import com.sscanner.team.trashcan.entity.Trashcan;
@@ -76,6 +77,7 @@ public class TrashcanServiceImpl implements TrashcanService {
         return convertToTrashcanResponses(trashcans);
     }
 
+    @TimeTrace
     private List<Trashcan> getTrashcansByLatAndLon(BigDecimal minLat, BigDecimal maxLat, BigDecimal minLon, BigDecimal maxLon) {
         return trashcanRepository.findTrashcansWithinBoundingBox(minLat, maxLat, minLon, maxLon)
                 .orElseThrow(() -> new BadRequestException(NOT_FOUND_NEARBY_TRASHCANS));
