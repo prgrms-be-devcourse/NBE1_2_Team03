@@ -51,7 +51,7 @@ public class UserController {
     // 핸드폰 번호 수정 요청
     @PatchMapping("/change-phone")
     public ApiResponse <UserPhoneUpdateResponseDto> updatePhoneNumber(@Valid @RequestBody UserPhoneUpdateRequestDto requestDto) {
-        UserPhoneUpdateResponseDto responseDto = userService.updatePhoneNumber(requestDto.newPhone());
+        UserPhoneUpdateResponseDto responseDto = userService.updatePhoneNumber(requestDto);
         return ApiResponse.ok(responseDto,"핸드폰 번호가 수정되었습니다.");
     }
 
