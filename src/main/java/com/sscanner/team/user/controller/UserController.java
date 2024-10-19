@@ -3,12 +3,15 @@ package com.sscanner.team.user.controller;
 import com.sscanner.team.global.common.response.ApiResponse;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
+import com.sscanner.team.user.entity.User;
 import com.sscanner.team.user.requestdto.*;
 import com.sscanner.team.user.responsedto.*;
 import com.sscanner.team.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -67,6 +70,13 @@ public class UserController {
     public ApiResponse<Void> deleteUSer(){
         userService.deleteUser();
         return ApiResponse.ok(200, null,"회원 탈퇴 성공");
+    }
+
+    //아이디 찾기
+    @PostMapping("/find-id")
+    public ApiResponse<UserFindIdResponseDto> findId(@RequestBody UserFindIdRequstDto requestDto) {
+        UserFindIdResponseDto responseDto = userService.findUserId(requestDto);
+        return ApiResponse.ok(200, responseDto,"아이디 찾기 성공");
     }
 }
 
