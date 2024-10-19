@@ -6,7 +6,9 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Document(indexName = "trashcan")
@@ -23,6 +25,9 @@ public class TrashcanDocument {
 
     @Field(type = FieldType.Double)
     private BigDecimal longitude;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @Builder
     public TrashcanDocument(Long id, String roadNameAddress, BigDecimal latitude, BigDecimal longitude) {
