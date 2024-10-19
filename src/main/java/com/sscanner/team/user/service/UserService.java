@@ -6,6 +6,7 @@ import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.DuplicateException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.repository.UserRepository;
+import com.sscanner.team.user.requestdto.UserFindIdRequstDto;
 import com.sscanner.team.user.requestdto.UserJoinRequestDto;
 import com.sscanner.team.user.requestdto.UserPasswordChangeRequestDto;
 import com.sscanner.team.user.requestdto.UserPhoneUpdateRequestDto;
@@ -17,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.sscanner.team.global.utils.UserUtils;
+
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -63,6 +67,9 @@ public class UserService {
 
         confirmPassword(requestDto.newPassword(), requestDto.confirmNewPassword());
     }
+
+    // 핸드폰 인증 메소드
+
 
     // 회원가입
     public UserJoinResponseDto join(UserJoinRequestDto req){
@@ -155,6 +162,23 @@ public class UserService {
         User user = userUtils.getUser();
         userRepository.delete(user);
     }
+
+    // 아이디 찾기
+    public UserFindIdResponseDto findUserId(UserFindIdRequstDto requestDto) {
+
+        Optional<User> user = userRepository.findByPhone(requestDto.phone());
+
+        if (user.isEmpty()) {
+            throw new NoSuchElementException("해당 번호로 가입된 사용자가 없습니다.");
+        }
+
+        if (!smsService.verifyCode(new SmsVerifyRequestDto(requestDto.phone(), requestDto.code()))) {
+            throw new IllegalArgumentException("핸드폰 인증에 실패하였습니다."); // 인증 실패 시 예외 던짐
+        }
+
+        return new UserFindIdResponseDto(user.get().getEmail());
+    }
+
 
 }
 
