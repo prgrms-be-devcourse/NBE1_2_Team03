@@ -7,7 +7,7 @@ import com.sscanner.team.global.exception.DuplicateException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.repository.UserRepository;
 import com.sscanner.team.user.requestdto.*;
-import com.sscanner.team.user.requestdto.UserFindIdRequstDto;
+import com.sscanner.team.user.requestdto.UserFindIdRequestDto;
 import com.sscanner.team.user.requestdto.UserJoinRequestDto;
 import com.sscanner.team.user.requestdto.UserPasswordChangeRequestDto;
 import com.sscanner.team.user.requestdto.UserPhoneUpdateRequestDto;
@@ -162,21 +162,18 @@ public class UserService {
     }
 
     // 아이디 찾기
-    public UserFindIdResponseDto findUserId(UserFindIdRequstDto requestDto) {
+    public UserFindIdResponseDto findUserId(UserFindIdRequestDto requestDto) {
 
-        Optional<User> user = userRepository.findByPhone(requestDto.phone());
-
-        if (user.isEmpty()) {
-            throw new NoSuchElementException("해당 번호로 가입된 사용자가 없습니다.");
-        }
+        User user = userRepository.findByPhone(requestDto.phone())
+                .orElseThrow(()-> new BadRequestException(ExceptionCode.USER_NOT_FOUND_BY_PHONE));
 
         verifyPhoneCode(requestDto.phone(), requestDto.code());
-        return new UserFindIdResponseDto(user.get().getEmail());
+        return new UserFindIdResponseDto(user.getEmail());
     }
 
         // 비밀번호 찾기 (리셋)
         @Transactional
-        public String resetPassword(UserResetPasswordRequestDto requestDto) {
+        public void resetPassword(UserResetPasswordRequestDto requestDto) {
             User user = userRepository.findByEmailAndPhone(requestDto.email(), requestDto.phone())
                     .orElseThrow(() -> new NoSuchElementException("아이디 또는 핸드폰 번호를 다시 확인해 주세요."));
 
@@ -184,8 +181,6 @@ public class UserService {
 
             user.changePassword(passwordEncoder.encode(requestDto.newPassword()));
             userRepository.save(user);
-
-            return "비밀번호가 성공적으로 변경되었습니다.";
         }
 
     }
