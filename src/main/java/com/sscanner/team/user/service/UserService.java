@@ -6,19 +6,20 @@ import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.DuplicateException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.repository.UserRepository;
+import com.sscanner.team.user.requestdto.*;
 import com.sscanner.team.user.requestdto.UserFindIdRequstDto;
 import com.sscanner.team.user.requestdto.UserJoinRequestDto;
 import com.sscanner.team.user.requestdto.UserPasswordChangeRequestDto;
 import com.sscanner.team.user.requestdto.UserPhoneUpdateRequestDto;
 import com.sscanner.team.user.responsedto.*;
 import jakarta.transaction.Transactional;
-import com.sscanner.team.user.requestdto.SmsVerifyRequestDto;
 import com.sscanner.team.user.responsedto.UserJoinResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.sscanner.team.global.utils.UserUtils;
 
+import java.sql.SQLOutput;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -173,14 +174,32 @@ public class UserService {
         }
 
         if (!smsService.verifyCode(new SmsVerifyRequestDto(requestDto.phone(), requestDto.code()))) {
-            throw new IllegalArgumentException("핸드폰 인증에 실패하였습니다."); // 인증 실패 시 예외 던짐
+            throw new IllegalArgumentException("인증 번호가 일치하지 않습니다."); // 인증 실패 시 예외 던짐
         }
-
         return new UserFindIdResponseDto(user.get().getEmail());
     }
 
+        // 비밀번호 찾기 (리셋)
+        @Transactional
+        public String resetPassword(UserResetPasswordRequestDto requestDto) {
+            // 이메일과 전화번호로 사용자 조회
+            User user = userRepository.findByEmailAndPhone(requestDto.email(), requestDto.phone())
+                    .orElseThrow(() -> new NoSuchElementException("아이디나 핸드폰 번호를 다시 확인해 주세요."));
 
-}
+            // 인증 코드 검증
+            if (!smsService.verifyCode(new SmsVerifyRequestDto(requestDto.phone(), requestDto.code()))) {
+                throw new IllegalArgumentException("인증 번호가 일치하지 않습니다."); // 인증 실패 시 예외 던짐
+            }
+
+            // 비밀번호 변경 처리
+            user.changePassword(passwordEncoder.encode(requestDto.newPassword()));
+            userRepository.save(user);
+
+            // 비밀번호 변경 성공 메시지 반환
+            return "비밀번호가 성공적으로 변경되었습니다.";
+        }
+
+    }
 
 
 

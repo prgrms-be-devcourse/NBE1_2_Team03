@@ -3,15 +3,12 @@ package com.sscanner.team.user.controller;
 import com.sscanner.team.global.common.response.ApiResponse;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
-import com.sscanner.team.user.entity.User;
 import com.sscanner.team.user.requestdto.*;
 import com.sscanner.team.user.responsedto.*;
 import com.sscanner.team.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -77,6 +74,13 @@ public class UserController {
     public ApiResponse<UserFindIdResponseDto> findId(@RequestBody UserFindIdRequstDto requestDto) {
         UserFindIdResponseDto responseDto = userService.findUserId(requestDto);
         return ApiResponse.ok(200, responseDto,"아이디 찾기 성공");
+    }
+
+    // 비밀번호 찾기
+    @PostMapping("/reset-password")
+    public ApiResponse<String> resetPassword(@RequestBody UserResetPasswordRequestDto requestDto){
+        String message = userService.resetPassword(requestDto);
+        return ApiResponse.ok( message, "비밀번호 재설정 성공");
     }
 }
 
