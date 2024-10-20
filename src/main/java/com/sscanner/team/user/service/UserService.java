@@ -8,6 +8,7 @@ import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.repository.UserRepository;
 import com.sscanner.team.user.requestdto.UserJoinRequestDto;
 import com.sscanner.team.user.requestdto.UserPasswordChangeRequestDto;
+import com.sscanner.team.user.requestdto.UserPhoneUpdateRequestDto;
 import com.sscanner.team.user.responsedto.*;
 import jakarta.transaction.Transactional;
 import com.sscanner.team.user.requestdto.SmsVerifyRequestDto;
@@ -104,13 +105,20 @@ public class UserService {
 
     // 핸드폰 번호 수정
     @Transactional
-    public UserPhoneUpdateResponseDto updatePhoneNumber(String newPhone) {
+    public UserPhoneUpdateResponseDto updatePhoneNumber(UserPhoneUpdateRequestDto req) {
         User user = userUtils.getUser();
 
-        if (!user.isPhoneEqual(newPhone)) {
-            checkDuplicatedPhone(newPhone);
-            user.changePhone(newPhone);
+        if (user.isPhoneEqual(req.newPhone())) {
+            throw new BadRequestException(ExceptionCode.SAME_PHONE_NUMBER);
         }
+
+        checkDuplicatedPhone(req.newPhone());
+
+        if (!smsService.verifyCode(new SmsVerifyRequestDto(req.newPhone(), req.smsCode()))) {
+            throw new IllegalArgumentException("핸드폰 인증에 실패하였습니다.");
+        }
+
+        user.changePhone(req.newPhone());
         return UserPhoneUpdateResponseDto.from(user);
     }
 
