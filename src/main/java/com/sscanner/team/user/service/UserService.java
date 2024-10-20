@@ -19,7 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.sscanner.team.global.utils.UserUtils;
 
-import java.sql.SQLOutput;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -69,8 +68,13 @@ public class UserService {
         confirmPassword(requestDto.newPassword(), requestDto.confirmNewPassword());
     }
 
-    // 핸드폰 인증 메소드
+    // 핸드폰 인증 코드 검증
+    private void verifyPhoneCode(String phone, String code) {
+        if (!smsService.verifyCode(new SmsVerifyRequestDto(phone,code))) {
+            throw new BadRequestException(ExceptionCode.PHONE_VERIFICATION_FAILED);
+        }
 
+    }
 
     // 회원가입
     public UserJoinResponseDto join(UserJoinRequestDto req){
@@ -79,11 +83,7 @@ public class UserService {
         checkDuplicatedNickname(req.nickname());
         checkDuplicatedPhone(req.phone());
 
-        if (!smsService.verifyCode(new SmsVerifyRequestDto(req.phone(), req.smsCode()))) {
-            throw new IllegalArgumentException("핸드폰 인증에 실패하였습니다."); // 인증 실패 시 예외 던짐
-        }
-
-
+        verifyPhoneCode(req.phone(), req.smsCode());
         confirmPassword(req.password(), req.passwordCheck());
 
         User userEntity = req.toEntity(passwordEncoder.encode(req.password()));
@@ -121,10 +121,7 @@ public class UserService {
         }
 
         checkDuplicatedPhone(req.newPhone());
-
-        if (!smsService.verifyCode(new SmsVerifyRequestDto(req.newPhone(), req.smsCode()))) {
-            throw new IllegalArgumentException("핸드폰 인증에 실패하였습니다.");
-        }
+        verifyPhoneCode(req.newPhone(), req.smsCode());
 
         user.changePhone(req.newPhone());
         return UserPhoneUpdateResponseDto.from(user);
@@ -173,29 +170,21 @@ public class UserService {
             throw new NoSuchElementException("해당 번호로 가입된 사용자가 없습니다.");
         }
 
-        if (!smsService.verifyCode(new SmsVerifyRequestDto(requestDto.phone(), requestDto.code()))) {
-            throw new IllegalArgumentException("인증 번호가 일치하지 않습니다."); // 인증 실패 시 예외 던짐
-        }
+        verifyPhoneCode(requestDto.phone(), requestDto.code());
         return new UserFindIdResponseDto(user.get().getEmail());
     }
 
         // 비밀번호 찾기 (리셋)
         @Transactional
         public String resetPassword(UserResetPasswordRequestDto requestDto) {
-            // 이메일과 전화번호로 사용자 조회
             User user = userRepository.findByEmailAndPhone(requestDto.email(), requestDto.phone())
-                    .orElseThrow(() -> new NoSuchElementException("아이디나 핸드폰 번호를 다시 확인해 주세요."));
+                    .orElseThrow(() -> new NoSuchElementException("아이디 또는 핸드폰 번호를 다시 확인해 주세요."));
 
-            // 인증 코드 검증
-            if (!smsService.verifyCode(new SmsVerifyRequestDto(requestDto.phone(), requestDto.code()))) {
-                throw new IllegalArgumentException("인증 번호가 일치하지 않습니다."); // 인증 실패 시 예외 던짐
-            }
+            verifyPhoneCode(requestDto.phone(), requestDto.code());
 
-            // 비밀번호 변경 처리
             user.changePassword(passwordEncoder.encode(requestDto.newPassword()));
             userRepository.save(user);
 
-            // 비밀번호 변경 성공 메시지 반환
             return "비밀번호가 성공적으로 변경되었습니다.";
         }
 
