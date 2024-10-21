@@ -3,9 +3,9 @@ package com.sscanner.team.products.service;
 import com.sscanner.team.products.entity.Product;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
+import com.sscanner.team.products.entity.ProductImg;
 import com.sscanner.team.products.repository.ProductRepository;
 import com.sscanner.team.products.responsedto.ProductImgResponseDto;
-import com.sscanner.team.products.responsedto.ProductResponseDto;
 import com.sscanner.team.products.responsedto.ProductWithImgResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,25 +24,42 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductImgService productImgService;
 
-    // product & productImg n+1 문제 고려
     @Override
     public Map<String, Object> findAllWithImgs(Pageable pageable) {
         Page<Product> products = productRepository.findAll(pageable);
 
-        // 모든 Product의 ID 리스트를 추출
         List<Long> productIds = extractProductIds(products);
 
-        // Product ID 리스트를 사용해 한 번에 관련 이미지를 조회
-        Map<Long, List<ProductImgResponseDto>> productImgDtosMap = productImgService.findAllByProductIds(productIds);
+        Map<Long, List<ProductImg>> productImgsMap = productImgService.findImgsGroupedByProductId(productIds);
 
-        // 각 Product에 해당하는 이미지를 DTO로 변환
         List<ProductWithImgResponseDto> productWithImgDtos = new ArrayList<>();
         for (Product product : products) {
-            List<ProductImgResponseDto> productImgDtos = productImgDtosMap.getOrDefault(product.getId(), Collections.emptyList());
-            productWithImgDtos.add(toProductWithImgDto(product, productImgDtos));
+            List<ProductImg> productImgs = productImgsMap.getOrDefault(product.getId(), Collections.emptyList());
+            productWithImgDtos.add(toProductWithImgDto(product, productImgs));
         }
 
         return createResponse(productWithImgDtos, products);
+    }
+
+    @Override
+    public ProductWithImgResponseDto findWithImgById(Long productId) {
+        Product product = findById(productId);
+        List<ProductImg> productImgs = productImgService.findByProductId(productId);
+        return toProductWithImgDto(product, productImgs);
+    }
+
+    @Transactional
+    @Override
+    public List<ProductImgResponseDto> addImages(Long productId, List<MultipartFile> files) {
+        return productImgService.uploadImages(productId, files).stream()
+                .map(ProductImgResponseDto::from)
+                .toList();
+    }
+
+    @Override
+    public Product findById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_PRODUCT_ID));
     }
 
     private List<Long> extractProductIds(Page<Product> products) {
@@ -51,9 +68,9 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
     }
 
-    private ProductWithImgResponseDto toProductWithImgDto(Product product, List<ProductImgResponseDto> productImgDtos) {
-        List<String> imgUrls = productImgDtos.stream()
-                .map(ProductImgResponseDto::url)
+    private ProductWithImgResponseDto toProductWithImgDto(Product product, List<ProductImg> productImgs) {
+        List<String> imgUrls = productImgs.stream()
+                .map(ProductImg::getUrl)
                 .toList();
 
         return ProductWithImgResponseDto.from(product, imgUrls);
@@ -67,29 +84,5 @@ public class ProductServiceImpl implements ProductService {
         response.put("totalPages", products.getTotalPages());
 
         return response;
-    }
-
-    @Override
-    public ProductResponseDto findById(Long productId) {
-        return productRepository.findById(productId)
-                .map(ProductResponseDto::from)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_PRODUCT_ID));
-    }
-
-    @Override
-    public ProductWithImgResponseDto findWithImgById(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_PRODUCT_ID));
-        List<ProductImgResponseDto> productImgs = productImgService.findByProductId(productId);
-        return toProductWithImgDto(product, productImgs);
-    }
-
-    @Transactional
-    @Override
-    public List<ProductImgResponseDto> addImages(Long productId, List<MultipartFile> files) {
-        // 이미지 업로드 처리 후 DTO로 변환하여 반환
-        return productImgService.uploadImages(productId, files)
-                .stream()
-                .toList();
     }
 }
