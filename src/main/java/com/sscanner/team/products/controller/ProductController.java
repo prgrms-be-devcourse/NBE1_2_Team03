@@ -1,7 +1,7 @@
 package com.sscanner.team.products.controller;
 
 import com.sscanner.team.global.common.response.ApiResponse;
-import com.sscanner.team.products.responsedto.ProductUploadImgResponseDto;
+import com.sscanner.team.products.responsedto.ProductImgResponseDto;
 import com.sscanner.team.products.responsedto.ProductWithImgResponseDto;
 import com.sscanner.team.products.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class ProductController {
             @RequestParam(defaultValue = "9") int size
     ) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Map<String, Object> response = productService.getAllProducts(pageable);
+        Map<String, Object> response = productService.findAllWithImgs(pageable);
 
         return ApiResponse.ok(200, response, "상품 목록 조회 성공");
     }
@@ -45,7 +45,7 @@ public class ProductController {
      */
     @GetMapping("/{productId}")
     public ApiResponse<ProductWithImgResponseDto> getProductById(@PathVariable Long productId) {
-        ProductWithImgResponseDto product = productService.getProductWithImgById(productId);
+        ProductWithImgResponseDto product = productService.findWithImgById(productId);
         return ApiResponse.ok(200, product, "상품 정보 조회 성공");
     }
 
@@ -56,11 +56,11 @@ public class ProductController {
      * @return 업로드된 이미지 정보 목록
      */
     @PostMapping("/{productId}/images")
-    public ApiResponse<List<ProductUploadImgResponseDto>> uploadProductImages(
+    public ApiResponse<List<ProductImgResponseDto>> uploadProductImages(
             @PathVariable Long productId,
             @RequestParam("images") List<MultipartFile> files
     ) {
-        List<ProductUploadImgResponseDto> uploadedImages = productService.addProductImages(productId, files);
-        return ApiResponse.ok(200, uploadedImages, "이미지 등록 성공");
+        List<ProductImgResponseDto> response = productService.addImages(productId, files);
+        return ApiResponse.ok(200, response, "이미지 등록 성공");
     }
 }

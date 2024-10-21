@@ -2,7 +2,7 @@ package com.sscanner.team.points.controller;
 
 import com.sscanner.team.global.common.response.ApiResponse;
 import com.sscanner.team.points.requestdto.PointRequestDto;
-import com.sscanner.team.points.responsedto.PointResponseDto;
+import com.sscanner.team.points.responsedto.PointWithUserIdResponseDto;
 import com.sscanner.team.points.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +21,9 @@ public class PointController {
      * @return 포인트 조회 성공 메시지
      */
     @GetMapping("/{userId}")
-    public ApiResponse<PointResponseDto> getUserPoints(@PathVariable String userId) {
-        PointResponseDto pointResponseDto = pointService.getPoint(userId);
-        return ApiResponse.ok(200, pointResponseDto, "사용자 포인트 조회 성공");
+    public ApiResponse<PointWithUserIdResponseDto> getUserPoints(@PathVariable String userId) {
+        PointWithUserIdResponseDto pointWithUserIdResponseDto = pointService.getPoint(userId);
+        return ApiResponse.ok(200, pointWithUserIdResponseDto, "사용자 포인트 조회 성공");
     }
 
     /**
@@ -32,8 +32,8 @@ public class PointController {
      * @return 포인트 추가 성공 메시지
      */
     @PostMapping("/add")
-    public ApiResponse<PointResponseDto> addUserPoints(@RequestBody PointRequestDto pointRequestDto) {
-        PointResponseDto response = pointService.addPoint(pointRequestDto);
+    public ApiResponse<PointWithUserIdResponseDto> addUserPoints(@RequestBody PointRequestDto pointRequestDto) {
+        PointWithUserIdResponseDto response = pointService.addPoint(pointRequestDto);
         return ApiResponse.ok(201, response, "포인트가 성공적으로 추가되었습니다.");
     }
 }

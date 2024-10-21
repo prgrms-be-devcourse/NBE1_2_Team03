@@ -5,8 +5,10 @@ import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.products.entity.ProductImg;
 import com.sscanner.team.products.repository.ProductImgRepository;
+import com.sscanner.team.products.responsedto.ProductImgResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -19,50 +21,64 @@ public class ProductImgServiceImpl implements ProductImgService {
     private final ImageService imageService;
 
     @Override
-    public List<ProductImg> getProductImgsbyId(Long productId) {
-        return productImgRepository.findAllByProductId(productId);
+    public List<ProductImgResponseDto> findByProductId(Long productId) {
+        List<ProductImg> productImgs = productImgRepository.findAllByProductId(productId);
+
+        return productImgs.stream()
+                .map(ProductImgResponseDto::from)
+                .toList();
     }
 
     @Override
-    public Map<Long, List<ProductImg>> getAllProductImgsByIds(List<Long> productIds) {
+    public Map<Long, List<ProductImgResponseDto>> findAllByProductIds(List<Long> productIds) {
         List<ProductImg> productImgs = productImgRepository.findAllByProductIdIn(productIds);
 
-        Map<Long, List<ProductImg>> productImgsMap = new HashMap<>();
+        Map<Long, List<ProductImgResponseDto>> productImgDtosMap = new HashMap<>();
 
         for (ProductImg productImg : productImgs) {
             Long productId = productImg.getProductId();
-
-            productImgsMap.computeIfAbsent(productId, k -> new ArrayList<>()).add(productImg);
+            productImgDtosMap.computeIfAbsent(productId, k -> new ArrayList<>()).add(ProductImgResponseDto.from(productImg));
         }
 
-        return productImgsMap;
+        return productImgDtosMap;
     }
 
+    @Transactional
     @Override
-    public List<ProductImg> uploadProductImages(Long productId, List<MultipartFile> files) {
-        List<ProductImg> productImgList = new ArrayList<>();
+    public List<ProductImgResponseDto> uploadImages(Long productId, List<MultipartFile> files) {
+        List<ProductImgResponseDto> productImgs = new ArrayList<>();
 
-        for (MultipartFile file : files) {
-            try {
-                String imgUrl = imageService.makeImgUrl(file);
-                ProductImg productImg = ProductImg.builder()
-                        .productId(productId)
-                        .productImgUrl(imgUrl)
-                        .build();
-                productImgList.add(productImgRepository.save(productImg));
-            } catch (Exception e) {
-                throw new BadRequestException(ExceptionCode.FILE_UPLOAD_FAIL);
+        try {
+            for (MultipartFile file : files) {
+                String imgUrl = makeImgUrl(file);
+                ProductImg saveProductImg = saveProductImg(productId, imgUrl);
+                productImgs.add(ProductImgResponseDto.from(saveProductImg));
             }
+        } catch (Exception e) {
+            throw new BadRequestException(ExceptionCode.FILE_UPLOAD_FAIL);
         }
 
-        return productImgList;
+        return productImgs;
+    }
+
+    private ProductImg saveProductImg(Long productId, String imgUrl) {
+        ProductImg productImg = ProductImg.builder()
+                .productId(productId)
+                .url(imgUrl)
+                .build();
+
+        return productImgRepository.save(productImg);
+    }
+
+    private String makeImgUrl(MultipartFile file) {
+        return imageService.makeImgUrl(file);
     }
 
     @Override
-    public String getRepresentativeProductImgUrl(Long productId) {
-        List<ProductImg> productImgs = productImgRepository.findAllByProductId(productId);
-
-        // 대표 이미지가 없다면 첫 번째 이미지를 사용
-        return productImgs.isEmpty() ? null : productImgs.get(0).getProductImgUrl();
+    public String findMainImageUrl(Long productId) {
+        return productImgRepository.findAllByProductId(productId).stream()
+                .findFirst()
+                .map(ProductImg::getUrl)
+                .orElse(null);
     }
 }

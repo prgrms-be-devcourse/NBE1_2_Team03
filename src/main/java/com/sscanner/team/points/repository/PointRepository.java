@@ -1,10 +1,11 @@
 package com.sscanner.team.points.repository;
 
 import com.sscanner.team.points.entity.UserPoint;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface PointRepository extends JpaRepository<UserPoint, Long> {
@@ -12,5 +13,5 @@ public interface PointRepository extends JpaRepository<UserPoint, Long> {
     Optional<UserPoint> findByUserId(String userId);
 
     @Query("SELECT up FROM UserPoint up JOIN FETCH up.user")
-    List<UserPoint> findAllWithUser();
+    Page<UserPoint> findAllWithUser(Pageable pageable);
 }

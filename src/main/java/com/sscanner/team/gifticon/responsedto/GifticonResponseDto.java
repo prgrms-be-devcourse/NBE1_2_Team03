@@ -9,7 +9,7 @@ public record GifticonResponseDto(
 ) {
     public static GifticonResponseDto of(Product product, String productImageUrl, String barcodeImageUrl) {
         return new GifticonResponseDto(
-                product.getProductName(),
+                product.getName(),
                 productImageUrl,
                 barcodeImageUrl
         );

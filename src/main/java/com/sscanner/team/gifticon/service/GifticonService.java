@@ -32,8 +32,8 @@ public class GifticonService {
         // 각 바코드에 해당하는 상품 및 대표 이미지 정보 조회
         return barcodes.stream()
                 .map(barcode -> {
-                    Product product = productService.getProductEntityById(barcode.getProductId());
-                    String representativeProductImgUrl = productImgService.getRepresentativeProductImgUrl(barcode.getProductId());
+                    Product product = productService.findById(barcode.getProductId()).toEntity();
+                    String representativeProductImgUrl = productImgService.findMainImageUrl(barcode.getProductId());
                     return GifticonResponseDto.of(product, representativeProductImgUrl, barcode.getBarcodeUrl());
                 })
                 .toList();

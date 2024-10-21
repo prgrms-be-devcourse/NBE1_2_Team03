@@ -15,7 +15,7 @@ public record PointUpdateRequestDto(
 
     public UserPoint toEntity() {
         return UserPoint.builder()
-                .userPointId(userPointId)
+                .id(userPointId)
                 .user(user)
                 .point(newPoint)
                 .build();
