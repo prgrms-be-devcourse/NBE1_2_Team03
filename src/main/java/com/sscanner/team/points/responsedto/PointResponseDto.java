@@ -1,7 +1,7 @@
 package com.sscanner.team.points.responsedto;
 
-import com.sscanner.team.User;
 import com.sscanner.team.points.entity.UserPoint;
+import com.sscanner.team.user.entity.User;
 
 public record PointResponseDto(
         String userPointId,
