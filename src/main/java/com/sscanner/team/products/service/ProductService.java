@@ -14,4 +14,5 @@ public interface ProductService {
     ProductWithImgResponseDto findWithImgById(Long productId);
     List<ProductImgResponseDto> addImages(Long productId, List<MultipartFile> files);
     Product findById(Long id);
+    Map<Long, Product> findProductsByIds(List<Long> productIds);
 }

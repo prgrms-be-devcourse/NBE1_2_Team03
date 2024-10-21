@@ -62,6 +62,16 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_PRODUCT_ID));
     }
 
+    @Override
+    public Map<Long, Product> findProductsByIds(List<Long> productIds) {
+        List<Product> products = productRepository.findAllById(productIds);
+        Map<Long, Product> productMap = new HashMap<>();
+        for (Product product : products) {
+            productMap.put(product.getId(), product);
+        }
+        return productMap;
+    }
+
     private List<Long> extractProductIds(Page<Product> products) {
         return products.stream()
                 .map(Product::getId)
