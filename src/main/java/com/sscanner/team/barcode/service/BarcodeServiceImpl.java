@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class BarcodeService {
+public class BarcodeServiceImpl implements BarcodeService {
 
     private final BarcodeRepository barcodeRepository;
     private final ImageService imageService;
