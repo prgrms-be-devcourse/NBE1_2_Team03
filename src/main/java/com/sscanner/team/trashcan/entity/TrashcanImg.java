@@ -38,5 +38,7 @@ public class TrashcanImg extends BaseEntity {
 
     }
 
-
+    public void changeImgUrl(String chosenImgUrl) {
+        this.trashcanImgUrl = chosenImgUrl;
+    }
 }

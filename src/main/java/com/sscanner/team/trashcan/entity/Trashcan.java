@@ -66,4 +66,7 @@ public class Trashcan extends BaseEntity {
         this.trashCategory = requestDto.trashCategory();
     }
 
+    public void changeTrashcanStatus(TrashcanStatus updatedTrashcanStatus) {
+        this.trashcanStatus = updatedTrashcanStatus;
+    }
 }

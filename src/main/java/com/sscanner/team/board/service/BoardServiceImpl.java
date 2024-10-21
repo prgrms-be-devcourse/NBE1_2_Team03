@@ -1,5 +1,6 @@
 package com.sscanner.team.board.service;
 
+import com.sscanner.team.admin.responsedto.AdminBoardInfoResponseDTO;
 import com.sscanner.team.user.entity.User;
 import com.sscanner.team.board.entity.Board;
 import com.sscanner.team.board.entity.BoardImg;
@@ -10,6 +11,7 @@ import com.sscanner.team.board.responsedto.BoardInfoResponseDTO;
 import com.sscanner.team.board.responsedto.BoardListResponseDTO;
 import com.sscanner.team.board.responsedto.BoardLocationInfoResponseDTO;
 import com.sscanner.team.board.responsedto.BoardResponseDTO;
+import com.sscanner.team.board.type.ApprovalStatus;
 import com.sscanner.team.board.type.BoardCategory;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.utils.UserUtils;
@@ -152,6 +154,20 @@ public class BoardServiceImpl implements BoardService{
         return boardRepository
                 .findById(boardId)
                 .orElseThrow(() -> new BadRequestException(NOT_EXIST_BOARD));
+    }
+
+    @Override
+    public Page<AdminBoardInfoResponseDTO> getBoardsForAdmin(ApprovalStatus approvalStatus, TrashCategory trashCategory,
+                                                      BoardCategory boardCategory, Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.DESC, "updatedAt");
+
+        Page<Board> boards =
+                boardRepository.findAllByStatusAndCategories(approvalStatus, boardCategory, trashCategory, pageRequest);
+
+        return boards.map(board -> {
+            List<BoardImg> boardImgs = boardImgService.getBoardImgs(board.getId());
+            return AdminBoardInfoResponseDTO.of(board, boardImgs.get(0).getBoardImgUrl());
+        });
     }
 
     private void isMatchAuthor(User user, Board board) {

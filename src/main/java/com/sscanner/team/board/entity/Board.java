@@ -5,6 +5,7 @@ import com.sscanner.team.board.requestdto.BoardUpdateRequestDTO;
 import com.sscanner.team.board.type.ApprovalStatus;
 import com.sscanner.team.board.type.BoardCategory;
 import com.sscanner.team.global.common.BaseEntity;
+import com.sscanner.team.trashcan.entity.Trashcan;
 import com.sscanner.team.trashcan.type.TrashCategory;
 import com.sscanner.team.trashcan.type.TrashcanStatus;
 import jakarta.persistence.*;
@@ -100,5 +101,23 @@ public class Board extends BaseEntity {
         this.detailedAddress = boardUpdateRequestDTO.detailedAddress();
         this.trashCategory = boardUpdateRequestDTO.trashCategory();
         this.updatedTrashcanStatus = boardUpdateRequestDTO.updatedTrashcanStatus();
+    }
+
+    public void changeApprovalStatus(ApprovalStatus approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
+    public void changeTrashcanId(Long trashcanId) {
+        this.trashcanId = trashcanId;
+    }
+
+    public Trashcan toEntityTrashcan() {
+        return Trashcan.builder()
+                .latitude(this.latitude)
+                .longitude(this.longitude)
+                .roadNameAddress(this.roadNameAddress)
+                .detailedAddress(this.detailedAddress)
+                .trashCategory(this.trashCategory)
+                .build();
     }
 }

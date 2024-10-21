@@ -1,5 +1,6 @@
 package com.sscanner.team.trashcan.service;
 
+import com.sscanner.team.trashcan.entity.Trashcan;
 import com.sscanner.team.trashcan.requestDto.RegisterTrashcanRequestDto;
 import com.sscanner.team.trashcan.requestDto.UpdateTrashcanRequestDto;
 import com.sscanner.team.trashcan.responseDto.TrashcanResponseDto;
@@ -24,6 +25,9 @@ public interface TrashcanService {
 
     TrashcanResponseDto updateTrashcanInfo(Long trashcanId, UpdateTrashcanRequestDto requestDto);
 
+    Trashcan getTrashcanById(Long trashcanId);
 
     List<TrashcanResponseDto> getTrashcanByCoordinate(BigDecimal latitude, BigDecimal longitude);
+
+    void saveTrashcan(Trashcan trashcan);
 }

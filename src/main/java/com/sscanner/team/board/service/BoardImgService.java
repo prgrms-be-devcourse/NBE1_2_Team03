@@ -10,4 +10,5 @@ public interface BoardImgService {
     void deleteBoardImgs(Long boardId);
     List<BoardImg> updateBoardImgs(Long boardId, List<MultipartFile> files);
     List<BoardImg> getBoardImgs(Long boardId);
+    void checkExistImgUrl(Long boardId, String chosenImgUrl);
 }
