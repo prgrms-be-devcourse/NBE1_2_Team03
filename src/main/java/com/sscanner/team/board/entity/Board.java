@@ -1,6 +1,6 @@
 package com.sscanner.team.board.entity;
 
-import com.sscanner.team.User;
+import com.sscanner.team.user.entity.User;
 import com.sscanner.team.board.requestdto.BoardUpdateRequestDTO;
 import com.sscanner.team.board.type.ApprovalStatus;
 import com.sscanner.team.board.type.BoardCategory;

@@ -1,6 +1,6 @@
 package com.sscanner.team.comment.entity;
 
-import com.sscanner.team.User;
+import com.sscanner.team.user.entity.User;
 import com.sscanner.team.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
