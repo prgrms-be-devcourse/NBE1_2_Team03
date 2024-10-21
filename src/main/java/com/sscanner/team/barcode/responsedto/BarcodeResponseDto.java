@@ -7,7 +7,7 @@ public record BarcodeResponseDto(
         String barcodeUrl,
         Long productId
 ) {
-    public static BarcodeResponseDto of(Barcode barcode) {
+    public static BarcodeResponseDto from(Barcode barcode) {
         return new BarcodeResponseDto(
                 barcode.getId(),
                 barcode.getBarcodeUrl(),
