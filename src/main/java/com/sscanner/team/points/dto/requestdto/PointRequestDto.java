@@ -1,4 +1,4 @@
-package com.sscanner.team.points.requestdto;
+package com.sscanner.team.points.dto.requestdto;
 
 
 public record PointRequestDto(

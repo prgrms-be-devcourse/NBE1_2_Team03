@@ -30,16 +30,16 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public PointPaymentResponseDto payPoint(PointPaymentRequestDto pointPaymentRequestDto) {
+    public PointPaymentResponseDto processPointPayment(PointPaymentRequestDto pointPaymentRequestDto) {
         String userId = pointPaymentRequestDto.userId();
         Long productId = pointPaymentRequestDto.productId();
 
-        Product product = productService.findById(productId).toEntity();
+        Product product = productService.findById(productId);
         Integer productPrice = product.getPrice();
 
         processPointDeduction(userId, productPrice);
 
-        UserPoint userPoint = pointService.findByUserId(userId).toEntity();
+        UserPoint userPoint = pointService.findByUserId(userId);
 
         Barcode barcode = barcodeService.createAndSaveBarcode(userId, productId);
 
