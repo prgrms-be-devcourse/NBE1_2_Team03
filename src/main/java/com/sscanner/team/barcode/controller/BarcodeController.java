@@ -19,8 +19,8 @@ public class BarcodeController {
     private final BarcodeService barcodeService;
 
     @GetMapping("/{userId}")
-    public ApiResponse<List<BarcodeResponseDto>> getUserBarcodes(@PathVariable String userId) {
-        List<BarcodeResponseDto> barcodes = barcodeService.getBarcodesByUserId(userId);
+    public ApiResponse<List<BarcodeResponseDto>> findUserBarcodes(@PathVariable String userId) {
+        List<BarcodeResponseDto> barcodes = barcodeService.findBarcodesByUserId(userId);
         return ApiResponse.ok(200, barcodes, "바코드 목록 조회 성공");
     }
 }
