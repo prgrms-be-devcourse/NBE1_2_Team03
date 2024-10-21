@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface ProductImgService {
-    List<ProductImg> getProductImgsbyId(Long productId);
-    Map<Long, List<ProductImg>> getAllProductImgsByIds(List<Long> productIds);
-    List<ProductImg> uploadProductImages(Long productId, List<MultipartFile> files);
-    String getRepresentativeProductImgUrl(Long productId);
+    List<ProductImg> findByProductId(Long productId);
+    Map<Long, List<ProductImg>> findImgsGroupedByProductId(List<Long> productIds);
+    Map<Long, String> findMainImageUrlsByProductIds(List<Long> productIds);
+    List<ProductImg> uploadImages(Long productId, List<MultipartFile> files);
 }
