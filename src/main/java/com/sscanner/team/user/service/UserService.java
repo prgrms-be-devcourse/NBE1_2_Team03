@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import com.sscanner.team.global.utils.UserUtils;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
