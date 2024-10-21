@@ -68,6 +68,20 @@ public class UserController {
         userService.deleteUser();
         return ApiResponse.ok(200, null,"회원 탈퇴 성공");
     }
+
+    //아이디 찾기
+    @PostMapping("/find-id")
+    public ApiResponse<UserFindIdResponseDto> findId(@RequestBody UserFindIdRequestDto requestDto) {
+        UserFindIdResponseDto responseDto = userService.findUserId(requestDto);
+        return ApiResponse.ok(200, responseDto,"아이디 찾기 성공");
+    }
+
+    // 비밀번호 찾기
+    @PostMapping("/reset-password")
+    public ApiResponse<String> resetPassword(@RequestBody UserResetPasswordRequestDto requestDto){
+        userService.resetPassword(requestDto);
+        return ApiResponse.ok( 200,null, "비밀번호가 성공적으로 변경되었습니다.");
+    }
 }
 
 

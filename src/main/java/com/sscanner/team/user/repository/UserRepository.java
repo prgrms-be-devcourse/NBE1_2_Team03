@@ -20,5 +20,6 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Transactional
     @Query(value = "DELETE FROM user WHERE deleted_at < :date", nativeQuery = true)
     void deleteAllByDeletedAtBefore(LocalDateTime date);// 회원 탈퇴 30일 지난 사용자
+    Optional<User> findByEmailAndPhone(String email, String phone);
 }
 

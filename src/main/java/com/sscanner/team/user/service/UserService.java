@@ -6,17 +6,21 @@ import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.DuplicateException;
 import com.sscanner.team.global.exception.ExceptionCode;
 import com.sscanner.team.user.repository.UserRepository;
+import com.sscanner.team.user.requestdto.*;
+import com.sscanner.team.user.requestdto.UserFindIdRequestDto;
 import com.sscanner.team.user.requestdto.UserJoinRequestDto;
 import com.sscanner.team.user.requestdto.UserPasswordChangeRequestDto;
 import com.sscanner.team.user.requestdto.UserPhoneUpdateRequestDto;
 import com.sscanner.team.user.responsedto.*;
 import jakarta.transaction.Transactional;
-import com.sscanner.team.user.requestdto.SmsVerifyRequestDto;
 import com.sscanner.team.user.responsedto.UserJoinResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.sscanner.team.global.utils.UserUtils;
+
+import java.util.NoSuchElementException;
+
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +68,14 @@ public class UserService {
         confirmPassword(requestDto.newPassword(), requestDto.confirmNewPassword());
     }
 
+    // 핸드폰 인증 코드 검증
+    private void verifyPhoneCode(String phone, String code) {
+        if (!smsService.verifyCode(new SmsVerifyRequestDto(phone,code))) {
+            throw new BadRequestException(ExceptionCode.PHONE_VERIFICATION_FAILED);
+        }
+
+    }
+
     // 회원가입
     public UserJoinResponseDto join(UserJoinRequestDto req){
 
@@ -71,11 +83,7 @@ public class UserService {
         checkDuplicatedNickname(req.nickname());
         checkDuplicatedPhone(req.phone());
 
-        if (!smsService.verifyCode(new SmsVerifyRequestDto(req.phone(), req.smsCode()))) {
-            throw new IllegalArgumentException("핸드폰 인증에 실패하였습니다."); // 인증 실패 시 예외 던짐
-        }
-
-
+        verifyPhoneCode(req.phone(), req.smsCode());
         confirmPassword(req.password(), req.passwordCheck());
 
         User userEntity = req.toEntity(passwordEncoder.encode(req.password()));
@@ -113,10 +121,7 @@ public class UserService {
         }
 
         checkDuplicatedPhone(req.newPhone());
-
-        if (!smsService.verifyCode(new SmsVerifyRequestDto(req.newPhone(), req.smsCode()))) {
-            throw new IllegalArgumentException("핸드폰 인증에 실패하였습니다.");
-        }
+        verifyPhoneCode(req.newPhone(), req.smsCode());
 
         user.changePhone(req.newPhone());
         return UserPhoneUpdateResponseDto.from(user);
@@ -156,7 +161,29 @@ public class UserService {
         userRepository.delete(user);
     }
 
-}
+    // 아이디 찾기
+    public UserFindIdResponseDto findUserId(UserFindIdRequestDto requestDto) {
+
+        User user = userRepository.findByPhone(requestDto.phone())
+                .orElseThrow(()-> new BadRequestException(ExceptionCode.USER_NOT_FOUND_BY_PHONE));
+
+        verifyPhoneCode(requestDto.phone(), requestDto.code());
+        return new UserFindIdResponseDto(user.getEmail());
+    }
+
+        // 비밀번호 찾기 (리셋)
+        @Transactional
+        public void resetPassword(UserResetPasswordRequestDto requestDto) {
+            User user = userRepository.findByEmailAndPhone(requestDto.email(), requestDto.phone())
+                    .orElseThrow(() -> new NoSuchElementException("아이디 또는 핸드폰 번호를 다시 확인해 주세요."));
+
+            verifyPhoneCode(requestDto.phone(), requestDto.code());
+
+            user.changePassword(passwordEncoder.encode(requestDto.newPassword()));
+            userRepository.save(user);
+        }
+
+    }
 
 
 
