@@ -1,4 +1,4 @@
-package com.sscanner.team.points.responsedto;
+package com.sscanner.team.points.dto.responsedto;
 
 public record PointWithUserIdResponseDto(
         String userId,

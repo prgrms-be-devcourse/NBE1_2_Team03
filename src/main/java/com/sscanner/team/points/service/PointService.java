@@ -1,21 +1,21 @@
 package com.sscanner.team.points.service;
 
-import com.sscanner.team.points.requestdto.PointRequestDto;
-import com.sscanner.team.points.requestdto.PointUpdateRequestDto;
-import com.sscanner.team.points.responsedto.PointResponseDto;
-import com.sscanner.team.points.responsedto.PointWithUserIdResponseDto;
+import com.sscanner.team.points.entity.UserPoint;
+import com.sscanner.team.points.dto.requestdto.PointRequestDto;
+import com.sscanner.team.points.dto.responsedto.PointWithUserIdResponseDto;
 
 import java.util.Set;
 
 public interface PointService {
-    PointWithUserIdResponseDto getPoint(String userId);
+    PointWithUserIdResponseDto getCachedPoint(String userId);
     PointWithUserIdResponseDto addPoint(PointRequestDto pointRequestDto);
     Integer fetchCachedPoint(String userId);
-    PointResponseDto findByUserId(String userId);
-    void removeBackupFlag(String userId);
+    UserPoint findByUserId(String userId);
     void markUserForBackup(String userId);
+    void updateUserPoint(UserPoint userPoint);
+    void removeBackupFlag(String userId);
     void decrementPoint(String userId, int productPrice);
-    void updateUserPoint(PointUpdateRequestDto pointUpdateRequestDto);
     Set<String> getFlaggedUsersForBackup();
+    Integer getPoint(String userId);
     void resetDailyPointsInCache();
 }
