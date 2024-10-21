@@ -19,7 +19,7 @@ public class PaymentController {
 
     @PostMapping
     public ApiResponse<PointPaymentResponseDto> payUserPoints(@RequestBody PointPaymentRequestDto pointPaymentRequestDto) {
-        PointPaymentResponseDto response = paymentService.payPoint(pointPaymentRequestDto);
+        PointPaymentResponseDto response = paymentService.processPointPayment(pointPaymentRequestDto);
         return ApiResponse.ok(201, response, "포인트가 성공적으로 사용되었습니다.");
     }
 }

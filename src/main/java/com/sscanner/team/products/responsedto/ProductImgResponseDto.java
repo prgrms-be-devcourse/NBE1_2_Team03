@@ -17,11 +17,4 @@ public record ProductImgResponseDto (
                 productImg.getUrl()
         );
     }
-
-    public ProductImg toEntity() {
-        return ProductImg.builder()
-                .productId(productId)
-                .url(url)
-                .build();
-    }
 }
