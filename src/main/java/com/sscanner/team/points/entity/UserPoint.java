@@ -13,7 +13,7 @@ import lombok.*;
 public class UserPoint extends BaseEntity {
     @Id
     @Column(name = "user_point_id", nullable = false, length = 16)
-    private String userPointId;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -23,17 +23,9 @@ public class UserPoint extends BaseEntity {
     private Integer point;
 
     @Builder
-    public UserPoint(String userPointId, User user, Integer point) {
-        this.userPointId = userPointId;
+    public UserPoint(String id, User user, Integer point) {
+        this.id = id;
         this.user = user;
         this.point = point;
-    }
-
-    public UserPoint updatePoint(Integer newPoint) {
-        return UserPoint.builder()
-                .userPointId(this.userPointId)
-                .user(this.user)
-                .point(newPoint)
-                .build();
     }
 }

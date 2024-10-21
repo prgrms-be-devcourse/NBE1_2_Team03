@@ -17,11 +17,6 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    /**
-     * 사용자의 포인트를 사용하는 API
-     * @param pointPaymentRequestDto 사용자 ID, 상품 ID
-     * @return 포인트 사용 성공 메시지
-     */
     @PostMapping
     public ApiResponse<PointPaymentResponseDto> payUserPoints(@RequestBody PointPaymentRequestDto pointPaymentRequestDto) {
         PointPaymentResponseDto response = paymentService.payPoint(pointPaymentRequestDto);
