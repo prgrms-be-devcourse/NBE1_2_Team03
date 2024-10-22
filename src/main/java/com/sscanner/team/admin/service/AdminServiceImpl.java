@@ -81,21 +81,28 @@ public class AdminServiceImpl implements AdminService {
 
         boardImgService.checkExistImgUrl(boardId, chosenImgUrl);
 
-        processBoardApproval(approvalStatus, board, chosenImgUrl);
+        if(approvalStatus.equals(ApprovalStatus.APPROVED)) {
+            processBoardApproval(board, chosenImgUrl);
+        }
 
         board.changeApprovalStatus(approvalStatus);
     }
 
-    private void processBoardApproval(ApprovalStatus approvalStatus, Board board, String chosenImgUrl) {
-        if(approvalStatus.equals(ApprovalStatus.APPROVED)) {
-            BoardCategory boardCategory = board.getBoardCategory();
-            if(boardCategory.equals(BoardCategory.MODIFY)) {
+    private void processBoardApproval(Board board, String chosenImgUrl) {
+        BoardCategory boardCategory = board.getBoardCategory();
+
+        switch (boardCategory) {
+            case MODIFY:
                 approveModifyBoard(board.getTrashcanId(), board.getUpdatedTrashcanStatus(), chosenImgUrl);
-            } else if(boardCategory.equals(BoardCategory.REMOVE)) {
+                break;
+            case REMOVE:
                 approveRemoveBoard(board.getTrashcanId());
-            } else if(boardCategory.equals(BoardCategory.ADD)) {
+                break;
+            case ADD:
                 approveAddBoard(board, chosenImgUrl);
-            }
+                break;
+            default:
+                throw new BadRequestException(MISMATCH_BOARD_TYPE);
         }
     }
 
