@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -24,27 +25,31 @@ public class HttpLoggingAspect {
 
     // Controller의 모든 메서드에 대해 적용
     @Pointcut("execution(* com.sscanner.team..controller.*.*(..))")
-    public void pointCut() {}
+    public void pointCut() {
+    }
 
     @Before("pointCut()")
     public void logHttpRequest(JoinPoint joinPoint) {
         MDC.put("traceId", UUID.randomUUID().toString()); // 멀티 스레드 환경에서도 로그를 구분할 수 있게 해줌
         startTime = System.currentTimeMillis();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        log.info("HTTP Request: {} {} from IP {}", request.getMethod(), request.getRequestURI(), request.getRemoteAddr());
+        log.info("HTTP Request: HTTPMethod={} Path={} from IP={}", request.getMethod(), request.getRequestURI(), request.getRemoteAddr());
     }
 
     // 메서드 호출 후 정상적으로 반환된 경우 로그 남기기
     @AfterReturning(pointcut = "pointCut()", returning = "result")
     public void logAfterReturning(JoinPoint joinPoint, Object result) {
-        log.info("Exiting Controller: {} with result {}", joinPoint.getSignature(), result);
+        log.info("Exiting Controller: Method={} with Return={}", ((MethodSignature) joinPoint.getSignature()).getMethod().getName(), result);
     }
 
     // 예외 발생 시 로그 남기기
     @AfterThrowing(pointcut = "pointCut()", throwing = "ex")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable ex) {
-        if(ex instanceof BadRequestException || ex instanceof DuplicateException || ex instanceof MethodArgumentNotValidException) return;
-        log.error("Exception in Controller: {} with arguments {}. Exception: {}", joinPoint.getSignature(), Arrays.toString(joinPoint.getArgs()), ex.getMessage(), ex);
+        // 의도된 비즈니스 예외는 warn으로 처리
+        if (ex instanceof BadRequestException || ex instanceof DuplicateException || ex instanceof MethodArgumentNotValidException)
+            log.warn("Exception in Controller: Method={} with Args={}. Exception={}", ((MethodSignature) joinPoint.getSignature()).getMethod().getName(), Arrays.toString(joinPoint.getArgs()), ex.getMessage(), ex);
+        else
+            log.error("Exception in Controller: Method={} with Args={}. Exception={}", ((MethodSignature) joinPoint.getSignature()).getMethod().getName(), Arrays.toString(joinPoint.getArgs()), ex.getMessage(), ex);
     }
 
 
@@ -52,7 +57,7 @@ public class HttpLoggingAspect {
     @After("pointCut()")
     public void logAfter(JoinPoint joinPoint) {
         long executionTime = System.currentTimeMillis() - startTime;
-        log.info("{} Execution time: {}ms", joinPoint.getSignature(), executionTime);
+        log.info("Method={} ExecutionTime={}ms", ((MethodSignature) joinPoint.getSignature()).getMethod().getName(), executionTime);
         MDC.clear();
     }
 }
