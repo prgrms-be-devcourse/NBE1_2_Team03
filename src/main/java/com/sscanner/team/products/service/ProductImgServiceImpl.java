@@ -38,11 +38,15 @@ public class ProductImgServiceImpl implements ProductImgService {
     }
 
     @Override
-    public String findMainImageUrl(Long productId) {
-        return productImgRepository.findAllByProductId(productId).stream()
-                .findFirst()
-                .map(ProductImg::getUrl)
-                .orElse(null);
+    public Map<Long, String> findMainImageUrlsByProductIds(List<Long> productIds) {
+        List<ProductImg> productImgs = productImgRepository.findAllByProductIdIn(productIds);
+        Map<Long, String> mainImageMap = new HashMap<>();
+
+        for (ProductImg productImg : productImgs) {
+            mainImageMap.putIfAbsent(productImg.getProductId(), productImg.getUrl());
+        }
+
+        return mainImageMap;
     }
 
     @Transactional

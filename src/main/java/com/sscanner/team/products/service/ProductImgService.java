@@ -9,6 +9,6 @@ import java.util.Map;
 public interface ProductImgService {
     List<ProductImg> findByProductId(Long productId);
     Map<Long, List<ProductImg>> findImgsGroupedByProductId(List<Long> productIds);
-    String findMainImageUrl(Long productId);
+    Map<Long, String> findMainImageUrlsByProductIds(List<Long> productIds);
     List<ProductImg> uploadImages(Long productId, List<MultipartFile> files);
 }

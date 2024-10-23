@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -20,22 +20,30 @@ public class GifticonService {
     private final ProductService productService;
     private final ProductImgService productImgService;
 
-    /**
-     * 사용자별 기프티콘 정보를 제공하는 메서드 (대표 상품 이미지를 포함)
-     * @param userId 사용자 ID
-     * @return List<GifticonResponseDto> 기프티콘 목록
-     */
     public List<GifticonResponseDto> getGifticonsByUserId(String userId) {
-        // 사용자 바코드 조회
         List<Barcode> barcodes = barcodeRepository.findAllByUserId(userId);
 
-        // 각 바코드에 해당하는 상품 및 대표 이미지 정보 조회
+        List<Long> productIds = extractProductIds(barcodes);
+
+        Map<Long, Product> products = productService.findProductsByIds(productIds);
+        Map<Long, String> productImages = productImgService.findMainImageUrlsByProductIds(productIds);
+
         return barcodes.stream()
-                .map(barcode -> {
-                    Product product = productService.findById(barcode.getProductId());
-                    String representativeProductImgUrl = productImgService.findMainImageUrl(barcode.getProductId());
-                    return GifticonResponseDto.of(product, representativeProductImgUrl, barcode.getBarcodeUrl());
-                })
+                .map(barcode -> toGifticonResponseDto(barcode, products, productImages))
                 .toList();
     }
+
+    private List<Long> extractProductIds(List<Barcode> barcodes) {
+        return barcodes.stream()
+                .map(Barcode::getProductId)
+                .toList();
+    }
+
+    private GifticonResponseDto toGifticonResponseDto(Barcode barcode, Map<Long, Product> products, Map<Long, String> productImages) {
+        Product product = products.get(barcode.getProductId());
+        String representativeProductImgUrl = productImages.get(barcode.getProductId());
+
+        return GifticonResponseDto.of(product, representativeProductImgUrl, barcode.getBarcodeUrl());
+    }
 }
+
