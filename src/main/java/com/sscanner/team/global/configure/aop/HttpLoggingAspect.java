@@ -1,5 +1,6 @@
 package com.sscanner.team.global.configure.aop;
 
+import com.sscanner.team.global.common.response.ApiResponse;
 import com.sscanner.team.global.exception.BadRequestException;
 import com.sscanner.team.global.exception.DuplicateException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -37,27 +39,43 @@ public class HttpLoggingAspect {
     }
 
     // 메서드 호출 후 정상적으로 반환된 경우 로그 남기기
-    @AfterReturning(pointcut = "pointCut()", returning = "result")
-    public void logAfterReturning(JoinPoint joinPoint, Object result) {
-        log.info("Exiting Controller: Method={} with Return={}", ((MethodSignature) joinPoint.getSignature()).getMethod().getName(), result);
+    @AfterReturning(pointcut = "pointCut()", returning = "response")
+    public void logAfterReturning(JoinPoint joinPoint, ApiResponse<?> response) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        log.info("HTTP Response: HTTPMethod={} Path={} from IP={} with ResponseCode={}, ResponseMessage={}, ResponseData={}"
+                , request.getMethod(), request.getRequestURI(), request.getRemoteAddr(), response.getCode(), response.getMessage(), response.getData());
     }
 
     // 예외 발생 시 로그 남기기
     @AfterThrowing(pointcut = "pointCut()", throwing = "ex")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable ex) {
-        // 의도된 비즈니스 예외는 warn으로 처리
-        if (ex instanceof BadRequestException || ex instanceof DuplicateException || ex instanceof MethodArgumentNotValidException)
-            log.warn("Exception in Controller: Method={} with Args={}. Exception={}", ((MethodSignature) joinPoint.getSignature()).getMethod().getName(), Arrays.toString(joinPoint.getArgs()), ex.getMessage(), ex);
-        else
-            log.error("Exception in Controller: Method={} with Args={}. Exception={}", ((MethodSignature) joinPoint.getSignature()).getMethod().getName(), Arrays.toString(joinPoint.getArgs()), ex.getMessage(), ex);
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        // 특정 비즈니스 예외 처리: Todo: 이런 비즈니스 예외에 대한 부모클래스를 선언해서 코드를 깔끔하게 하기
+        if (ex instanceof BadRequestException badRequestEx) {
+            log.warn("HTTP Response: HTTPMethod={} Path={} from IP={} with ResponseCode={}, ResponseMessage={}, ResponseData={}"
+                    , request.getMethod(), request.getRequestURI(), request.getRemoteAddr(), badRequestEx.getCode(), badRequestEx.getMessage(), null, ex);
+        } else if (ex instanceof DuplicateException duplicateEx) {
+            log.warn("HTTP Response: HTTPMethod={} Path={} from IP={} with ResponseCode={}, ResponseMessage={}, ResponseData={}"
+                    , request.getMethod(), request.getRequestURI(), request.getRemoteAddr(), duplicateEx.getCode(), duplicateEx.getMessage(), null, ex);
+        } else if (ex instanceof MethodArgumentNotValidException) {
+            String errMessage = Objects.requireNonNull(((MethodArgumentNotValidException) ex).getBindingResult().getFieldError()).getDefaultMessage();
+            log.warn("HTTP Response: HTTPMethod={} Path={} from IP={} with ResponseCode=400, ResponseMessage={}, ResponseData={}"
+                    , request.getMethod(), request.getRequestURI(), request.getRemoteAddr(), errMessage, null, ex);
+        } else {
+            // 그 외의 예외는 기본적인 에러 로그로 처리
+            log.error("HTTP Response: HTTPMethod={} Path={} from IP={} with ResponseCode=500, ResponseMessage={}, ResponseData={}"
+                    , request.getMethod(), request.getRequestURI(), request.getRemoteAddr(), ex.getMessage(), null, ex);
+        }
     }
 
 
     // 완전히 종료된후 메서드 실행시간 측정하기
     @After("pointCut()")
     public void logAfter(JoinPoint joinPoint) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         long executionTime = System.currentTimeMillis() - startTime;
-        log.info("Method={} ExecutionTime={}ms", ((MethodSignature) joinPoint.getSignature()).getMethod().getName(), executionTime);
+        log.info("API Execution: HTTPMethod={} Path={} from IP={} ExecutionTime={}ms", request.getMethod(), request.getRequestURI(), request.getRemoteAddr(), executionTime);
         MDC.clear();
     }
+
 }
