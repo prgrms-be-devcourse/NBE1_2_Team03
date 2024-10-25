@@ -14,4 +14,6 @@ public interface BoardImgRepository extends JpaRepository<BoardImg, Long> {
     @Modifying
     @Query("update BoardImg bi set bi.deletedAt = NOW() where bi.boardId = :boardId")
     void deleteAll(@Param("boardId") Long boardId);
+
+    boolean existsByBoardIdAndAndBoardImgUrl(Long boardId, String imgUrl);
 }

@@ -60,4 +60,11 @@ public class BoardImgServiceImpl implements BoardImgService{
 
         return boardImgs;
     }
+
+    public void checkExistImgUrl(Long boardId, String chosenImgUrl) {
+        boolean isExist = boardImgRepository.existsByBoardIdAndAndBoardImgUrl(boardId, chosenImgUrl);
+        if(!isExist) {
+            throw new BadRequestException(NOT_EXIST_BOARD_IMG);
+        }
+    }
 }

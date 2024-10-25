@@ -56,7 +56,7 @@ public class TrashcanServiceImpl implements TrashcanService {
         return TrashcanWithImgResponseDto.of(trashcan, trashcanImg);
     }
 
-    private Trashcan getTrashcanById(Long trashcanId) {
+    public Trashcan getTrashcanById(Long trashcanId) {
         return trashcanRepository.findById(trashcanId)
                 .orElseThrow(() -> new BadRequestException(NOT_EXIST_TRASHCAN_ID));
     }
@@ -123,4 +123,8 @@ public class TrashcanServiceImpl implements TrashcanService {
         return TrashcanResponseDto.from(trashcan);
     }
 
+    @Override
+    public void saveTrashcan(Trashcan trashcan) {
+        trashcanRepository.save(trashcan);
+    }
 }
