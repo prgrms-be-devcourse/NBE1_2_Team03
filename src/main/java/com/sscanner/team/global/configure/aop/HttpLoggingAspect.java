@@ -42,8 +42,8 @@ public class HttpLoggingAspect {
     @AfterReturning(pointcut = "pointCut()", returning = "response")
     public void logAfterReturning(JoinPoint joinPoint, ApiResponse<?> response) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        log.info("HTTP Response: ResponseCode={} ResponseMessage={} ResponseData=\"{}\""
-                , response.getCode(), response.getMessage(), response.getData());
+        log.info("HTTP Response: Path={} ResponseCode={} ResponseMessage={} ResponseData=\"{}\""
+                , request.getRequestURI(), response.getCode(), response.getMessage(), response.getData());
     }
 
     // 예외 발생 시 로그 남기기
@@ -52,19 +52,19 @@ public class HttpLoggingAspect {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         // 특정 비즈니스 예외 처리: Todo: 이런 비즈니스 예외에 대한 부모클래스를 선언해서 코드를 깔끔하게 하기
         if (ex instanceof BadRequestException badRequestEx) {
-            log.warn("HTTP Response: ResponseCode={} ResponseMessage=\"{}\" ResponseData=\"{}\""
-                    , badRequestEx.getCode(), badRequestEx.getMessage(), null, ex);
+            log.warn("HTTP Response: Path={} ResponseCode={} ResponseMessage=\"{}\" ResponseData=\"{}\""
+                    , request.getRequestURI(), badRequestEx.getCode(), badRequestEx.getMessage(), null, ex);
         } else if (ex instanceof DuplicateException duplicateEx) {
-            log.warn("HTTP Response: ResponseCode={} ResponseMessage=\"{}\" ResponseData=\"{}\""
-                    , duplicateEx.getCode(), duplicateEx.getMessage(), null, ex);
+            log.warn("HTTP Response: Path={} ResponseCode={} ResponseMessage=\"{}\" ResponseData=\"{}\""
+                    , request.getRequestURI(), duplicateEx.getCode(), duplicateEx.getMessage(), null, ex);
         } else if (ex instanceof MethodArgumentNotValidException) {
             String errMessage = Objects.requireNonNull(((MethodArgumentNotValidException) ex).getBindingResult().getFieldError()).getDefaultMessage();
-            log.warn("HTTP Response: ResponseCode=400 ResponseMessage=\"{}\" ResponseData=\"{}\""
-                    , errMessage, null, ex);
+            log.warn("HTTP Response: Path={} ResponseCode=400 ResponseMessage=\"{}\" ResponseData=\"{}\""
+                    , request.getRequestURI(), errMessage, null, ex);
         } else {
             // 그 외의 예외는 기본적인 에러 로그로 처리
-            log.error("HTTP Response: ResponseCode=500 ResponseMessage=\"{}\" ResponseData=\"{}\""
-                    , ex.getMessage(), null, ex);
+            log.error("HTTP Response: Path={} ResponseCode=500 ResponseMessage=\"{}\" ResponseData=\"{}\""
+                    , request.getRequestURI(), ex.getMessage(), null, ex);
         }
     }
 
@@ -74,7 +74,7 @@ public class HttpLoggingAspect {
     public void logAfter(JoinPoint joinPoint) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         long executionTime = System.currentTimeMillis() - startTime;
-        log.info("HTTP Execution: ExecutionTime={}ms", executionTime);
+        log.info("HTTP Execution: Path={} ExecutionTime={}ms", request.getRequestURI(), executionTime);
         MDC.clear();
     }
 
