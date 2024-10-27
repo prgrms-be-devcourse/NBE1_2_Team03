@@ -48,7 +48,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable);
+        http.csrf((csrf) -> csrf
+                .ignoringRequestMatchers("/api/**")  // 특정 경로에서만 CSRF 비활성화
+        );
         http.formLogin(AbstractHttpConfigurer::disable);
         http.httpBasic(AbstractHttpConfigurer::disable);
 
