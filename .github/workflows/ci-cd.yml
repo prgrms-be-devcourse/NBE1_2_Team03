@@ -3,7 +3,7 @@ name: CI-CD Pipeline
 on:
   push:
     branches:
-      [ main, feature/79-log-monitoring-plg ]
+      [ main ]
 
 jobs:
   CI-CD:
