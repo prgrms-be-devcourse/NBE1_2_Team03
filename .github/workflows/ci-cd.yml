@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - name: Print environment variables
-        run: env | grep 'HOME_URL\|REDIS_HOST'
+        run: env | grep 'HOME_URL\|REDIS_PORT'
       - name: Github Repository 파일 불러오기
         uses: actions/checkout@v4
 
