@@ -37,6 +37,8 @@ jobs:
       CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
 
     steps:
+      - name: Print environment variables
+        run: env | grep 'HOME_URL\|REDIS_HOST'
       - name: Github Repository 파일 불러오기
         uses: actions/checkout@v4
 
