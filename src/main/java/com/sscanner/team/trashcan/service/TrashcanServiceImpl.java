@@ -77,6 +77,14 @@ public class TrashcanServiceImpl implements TrashcanService {
         return convertToTrashcanResponses(trashcans);
     }
 
+    @Override
+    public List<Trashcan> findAllTrashcans() {
+
+        return trashcanRepository.findAllByDeletedAtIsNull();
+    }
+
+
+
     @TimeTrace
     private List<Trashcan> getTrashcansByLatAndLon(BigDecimal minLat, BigDecimal maxLat, BigDecimal minLon, BigDecimal maxLon) {
         return trashcanRepository.findTrashcansWithinBoundingBox(minLat, maxLat, minLon, maxLon)
@@ -91,21 +99,7 @@ public class TrashcanServiceImpl implements TrashcanService {
         return trashcanResponseDtos;
     }
 
-    @Override
-    public TrashcanResponseDto getNearByTrashcans() {
 
-        return null;
-    }
-
-    @Override
-    public TrashcanResponseDto getNearByTrashcans2() {
-        return null;
-    }
-
-    @Override
-    public TrashcanResponseDto getTrashcanByRoadAddress() {
-        return null;
-    }
 
 
     @Transactional
