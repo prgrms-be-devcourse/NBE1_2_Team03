@@ -94,7 +94,7 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     @Override
     public void givePoints(Long boardId, PointRequestDto pointRequestDto) {
-        Board board = boardService.getBoard(boardId);
+        Board board = boardService.getBoardFetchUser(boardId);
 
         pointService.addPoint(board.getUser().getUserId(), pointRequestDto);
     }

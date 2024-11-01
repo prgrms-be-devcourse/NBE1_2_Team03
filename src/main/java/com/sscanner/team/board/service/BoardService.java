@@ -31,4 +31,5 @@ public interface BoardService {
     Page<AdminBoardInfoResponseDTO> getBoardsForAdmin(ApprovalStatus approvalStatus, TrashCategory trashCategory,
                                                       BoardCategory boardCategory, Integer page, Integer size);
     List<BoardInfoResponseDTO> getMyBoards();
+    Board getBoardFetchUser(Long boardId);
 }

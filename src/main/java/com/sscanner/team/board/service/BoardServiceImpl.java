@@ -184,6 +184,13 @@ public class BoardServiceImpl implements BoardService{
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Board getBoardFetchUser(Long boardId) {
+        return boardRepository
+                .findBoardByIdFetchUser(boardId)
+                .orElseThrow(() -> new BadRequestException(NOT_EXIST_BOARD));
+    }
+
     private void isMatchAuthor(User user, Board board) {
         if(!board.getUser().equals(user)) {
             throw new BadRequestException(MISMATCH_AUTHOR);
