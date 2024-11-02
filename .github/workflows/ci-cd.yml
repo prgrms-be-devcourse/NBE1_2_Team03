@@ -3,7 +3,7 @@ name: CI-CD Pipeline
 on:
   push:
     branches:
-      [ main ]
+      [ main, chore/add-elk-env ]
 
 jobs:
   CI-CD:
