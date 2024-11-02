@@ -25,7 +25,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -48,20 +48,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable);
-        http.formLogin(AbstractHttpConfigurer::disable);
-        http.httpBasic(AbstractHttpConfigurer::disable);
-
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        // 경로별 인가
-        http.authorizeHttpRequests((authorize) ->
-                authorize.requestMatchers("/api/trashcan/getTrashcan/**","/api/trashcan/getNearByTrashcans","/api/trashcan/search","/login", "/", "health", "api/users/join", "/sms/**", "/api/users/reset-password", "/api/users/find-id", "/reissue").permitAll()
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                 // 경로별 인가
+                .authorizeHttpRequests((authorize) ->
+                authorize.requestMatchers("/login", "/", "health", "api/users/join", "/sms/**", "/api/users/reset-password", "/api/users/find-id", "/reissue", "/actuator/**", "/api/trashcan/getTrashcan/**","/api/trashcan/getNearByTrashcans","/api/trashcan/search").permitAll()
                         .requestMatchers("/api/admin/boards/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
-        );
+                )
+                .cors(withDefaults());
 
         configureFilters(http);
-
         return http.build();
     }
 
@@ -71,8 +71,9 @@ public class SecurityConfig {
 
         configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*", "http://10.0.2.2:*"));
 
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE","PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("Authorization", "access"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
