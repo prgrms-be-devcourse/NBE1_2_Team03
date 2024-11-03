@@ -74,3 +74,13 @@ coolsms:
 
 
 
+# 프로메테우스
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true

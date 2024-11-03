@@ -12,7 +12,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -49,19 +48,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf((csrf) -> csrf.disable())
+                .formLogin((auth) -> auth.disable())
+                .httpBasic((auth) -> auth.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                  // 경로별 인가
                 .authorizeHttpRequests((authorize) ->
-                authorize.requestMatchers("/login", "/", "health", "api/users/join", "/sms/**", "/api/users/reset-password", "/api/users/find-id", "/reissue", "/actuator/**", "/api/trashcan/getTrashcan/**","/api/trashcan/getNearByTrashcans","/api/trashcan/search").permitAll()
+                authorize.requestMatchers("/login", "/", "health", "api/users/join", "/sms/**", "/api/users/reset-password", "/api/users/find-id", "/reissue", "/actuator/**").permitAll()
                         .requestMatchers("/api/admin/boards/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .cors(withDefaults());
 
         configureFilters(http);
+
         return http.build();
     }
 
