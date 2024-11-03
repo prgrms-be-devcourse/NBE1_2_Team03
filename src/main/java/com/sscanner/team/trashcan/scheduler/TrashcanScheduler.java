@@ -17,7 +17,7 @@ public class TrashcanScheduler {
     private final TrashcanServiceImpl trashcanService;
 
 
-    @Scheduled(fixedRate = 66000)
+    @Scheduled(cron = "0 0 2 * * *")
     public void updateTrashcanDocuments() {
         List<Trashcan> trashcans = trashcanService.findAllTrashcans();
 
