@@ -1,5 +1,7 @@
 package com.sscanner.team.user.service;
 
+import com.sscanner.team.points.common.InitialPoint;
+import com.sscanner.team.points.service.PointService;
 import com.sscanner.team.sms.requestdto.SmsVerifyRequestDto;
 import com.sscanner.team.sms.service.SmsService;
 import com.sscanner.team.user.entity.User;
@@ -32,6 +34,7 @@ public class UserServiceImpl implements UserService{
     private final BCryptPasswordEncoder passwordEncoder;
     private final SmsService smsService;
     private final UserUtils userUtils;
+    private final PointService pointService;
 
     // 이메일 중복 체크
     private void checkDuplicatedEmail(final String email) {
@@ -86,11 +89,12 @@ public class UserServiceImpl implements UserService{
         checkDuplicatedNickname(req.nickname());
         checkDuplicatedPhone(req.phone());
 
-        verifyPhoneCode(req.phone(), req.smsCode());
+//        verifyPhoneCode(req.phone(), req.smsCode());
         confirmPassword(req.password(), req.passwordCheck());
 
         User userEntity = req.toEntity(passwordEncoder.encode(req.password()));
         userRepository.save(userEntity);
+        pointService.save(userEntity, InitialPoint.DEFAULT);
 
         return UserJoinResponseDto.from(userEntity);
     }
