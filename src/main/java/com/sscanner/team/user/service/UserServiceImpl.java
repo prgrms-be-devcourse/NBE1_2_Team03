@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService{
         checkDuplicatedNickname(req.nickname());
         checkDuplicatedPhone(req.phone());
 
-//        verifyPhoneCode(req.phone(), req.smsCode());
+        verifyPhoneCode(req.phone(), req.smsCode());
         confirmPassword(req.password(), req.passwordCheck());
 
         User userEntity = req.toEntity(passwordEncoder.encode(req.password()));
