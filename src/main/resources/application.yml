@@ -7,9 +7,9 @@ elastic:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${RDS_URL}
-    username: ${RDS_USERNAME}
-    password: ${RDS_PASSWORD}
+    url: ${HOME_URL}
+    username: ${HOME_USERNAME}
+    password: ${HOME_PASSWORD}
 
   jpa:
     hibernate:
@@ -72,7 +72,11 @@ coolsms:
     secret: "${COOLSMS_API_SECRET}"
     number: "${COOLSMS_PHONE_NUMBER}"
 
-
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
 
 # 프로메테우스
 management:
